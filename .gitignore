@@ -1,0 +1,53 @@
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+xcuserdata/
+*.xcworkspace/xcuserdata/
+*.playbook
+
+# XcodeGen
+# Keep project.yml; generated project is committed so Xcode opens without extra tools.
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+Secrets.xcconfig
+*.pem
+*.p12
+*.mobileprovision
+credentials.json
+secrets.json
+
+# Session / cookie dumps
+*.session
+*cookie*
+*cookies*
+*storage_state*
+*storage-state*
+fidelity-state.json
+public-token.json
+*.keychain
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+IconThumbs.db
+
+# Swift / SPM
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.build/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.cursor/
