@@ -9,7 +9,11 @@ struct BrokerWidgetsApp: App {
             StatusView()
                 .environmentObject(appState)
         } label: {
-            Label("Broker Widgets", systemImage: appState.menuBarSymbol)
+            if appState.menuBarShowsWarning {
+                Image(systemName: "exclamationmark.triangle.fill")
+            } else {
+                Image("MenuBarIcon")
+            }
         }
         .menuBarExtraStyle(.window)
 

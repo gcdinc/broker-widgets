@@ -45,7 +45,12 @@ struct StatusView: View {
     }
 
     private var header: some View {
-        HStack {
+        HStack(spacing: 8) {
+            Image("AppMark")
+                .resizable()
+                .interpolation(.high)
+                .frame(width: 22, height: 22)
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             Text("Broker Widgets")
                 .font(.headline)
             Spacer()

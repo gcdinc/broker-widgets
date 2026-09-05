@@ -38,11 +38,8 @@ final class AppState: ObservableObject {
         }
     }
 
-    var menuBarSymbol: String {
-        if fidelitySnapshot.status == .needsSignIn || publicSnapshot.status == .needsSecret || lastError != nil {
-            return "exclamationmark.triangle.fill"
-        }
-        return "chart.line.uptrend.xyaxis"
+    var menuBarShowsWarning: Bool {
+        fidelitySnapshot.status == .needsSignIn || publicSnapshot.status == .needsSecret || lastError != nil
     }
 
     func start() {
