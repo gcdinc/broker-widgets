@@ -2,7 +2,17 @@
 
 Two native macOS desktop widgets: **Fidelity positions** and **Public.com positions**. A menu-bar companion app refreshes holdings and writes a snapshot the widgets read.
 
-macOS 14+ (Sonoma). Xcode required.
+macOS 14+ (Sonoma).
+
+## Run without Xcode
+
+After you have built **Broker Widgets** once from Xcode (Signing → Personal Team):
+
+1. Quit the Xcode-launched copy.
+2. Open `BrokerWidgets.app` from Xcode’s Products folder, or copy it to `/Applications` and launch that.
+3. The menu bar icon is the app. Settings → **Open Broker Widgets at login** is on by default.
+
+A `.dmg` is optional. The `.app` is enough: drag it to Applications, open it, keep it in Login Items.
 
 ## Secrets stay off git
 
@@ -40,7 +50,7 @@ This can break when Fidelity changes their site.
 
 ## Refresh
 
-The menu-bar app reloads both brokers about every 5 minutes and asks WidgetKit to reload. Widgets themselves cannot keep a Fidelity web session.
+The menu-bar app reloads both brokers on a schedule (default **1 hour**; change it in Settings) and asks WidgetKit to reload. Widgets themselves cannot keep a Fidelity web session.
 
 ## Build from `project.yml`
 

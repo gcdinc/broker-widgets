@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
         Form {
@@ -19,8 +20,7 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Button("Save secret to Keychain") {
-                        try? appState.savePublicSecret()
-                        Task { await appState.refreshPublic() }
+                        Task { await appState.savePublicSecretAndRefresh() }
                     }
                     .disabled(appState.publicSecretDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -45,16 +45,76 @@ struct SettingsView: View {
                 snapshotSummary(appState.fidelitySnapshot)
             }
 
+            Section("Status") {
+                if let error = appState.lastError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                } else {
+                    Text("Last refresh completed.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Display") {
+                Picker("Panel font size", selection: $appState.panelFontScale) {
+                    ForEach(DisplaySettings.fontChoices, id: \.scale) { choice in
+                        Text(choice.label).tag(choice.scale)
+                    }
+                }
+                .onChange(of: appState.panelFontScale) { _, scale in
+                    appState.setPanelFontScale(scale)
+                }
+                Text("Drag a panel corner to resize. Panels sit with normal windows, not on top of other apps. Close with the × in the panel.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Startup") {
+                Toggle("Open Broker Widgets at login", isOn: $appState.launchAtLogin)
+                    .onChange(of: appState.launchAtLogin) { _, enabled in
+                        appState.setLaunchAtLogin(enabled)
+                    }
+                Text("Keeps the menu bar app and desktop panels running after you restart.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Refresh") {
+                Picker("Update widgets", selection: $appState.refreshInterval) {
+                    ForEach(RefreshSettings.choices, id: \.seconds) { choice in
+                        Text(choice.label).tag(choice.seconds)
+                    }
+                }
+                .onChange(of: appState.refreshInterval) { _, seconds in
+                    appState.setRefreshInterval(seconds)
+                }
                 Button {
                     Task { await appState.refreshAll() }
                 } label: {
                     Label(appState.isRefreshing ? "Refreshing…" : "Refresh now", systemImage: "arrow.clockwise")
                 }
                 .disabled(appState.isRefreshing)
-                Text("The menu-bar app must stay running so widgets can update. Add both widgets from the desktop / Notification Center gallery after the first launch.")
+                Text("Default is hourly. Two floating desktop panels open automatically and update with the app. macOS WidgetKit widgets can still be added; keep this menu-bar app running.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                Toggle("Show floating desktop panels", isOn: $appState.showDesktopPanels)
+                    .onChange(of: appState.showDesktopPanels) { _, show in
+                        appState.setShowDesktopPanels(show)
+                        if show {
+                            openWindow(id: "public-desktop")
+                            openWindow(id: "fidelity-desktop")
+                        } else {
+                            dismissWindow(id: "public-desktop")
+                            dismissWindow(id: "fidelity-desktop")
+                        }
+                    }
+                if !SnapshotStore.isAvailable {
+                    Text("App Group is unavailable, so widgets cannot read holdings. In Xcode enable App Groups (`group.com.gcd.BrokerWidgets`) on both targets.")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
             }
         }
         .formStyle(.grouped)
@@ -72,12 +132,20 @@ struct SettingsView: View {
                     .font(.body.monospacedDigit())
                 ForEach(snapshot.positions.prefix(8)) { position in
                     HStack {
-                        Text(position.symbol).font(.caption.monospaced()).frame(width: 64, alignment: .leading)
-                        Text(MoneyFormat.quantity(position.quantity)).font(.caption).foregroundStyle(.secondary)
+                        Text(position.displaySymbol).font(.caption.monospaced()).frame(width: 88, alignment: .leading)
+                        Text(position.displayAccountName)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
                         Spacer()
                         Text(MoneyFormat.usd(position.resolvedMarketValue)).font(.caption.monospacedDigit())
+                        Text(MoneyFormat.percent(position.resolvedDayChangePercent))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(pnlColor(position.resolvedDayChangePercent))
                     }
                 }
+            } else if snapshot.status == .error, let message = snapshot.message {
+                Text(message).font(.caption).foregroundStyle(.red)
             } else if let message = snapshot.message {
                 Text(message).font(.caption).foregroundStyle(.secondary)
             }

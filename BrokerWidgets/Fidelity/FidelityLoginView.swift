@@ -4,6 +4,8 @@ import WebKit
 struct FidelityLoginScreen: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dismissWindow) private var dismissWindow
+    @State private var isSaving = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -11,17 +13,21 @@ struct FidelityLoginScreen: View {
                 Text("Sign in to Fidelity")
                     .font(.headline)
                 Spacer()
-                Button("Save session") {
+                Button(isSaving ? "Saving…" : "Save session & load positions") {
                     Task {
+                        isSaving = true
                         await appState.saveFidelitySession()
+                        isSaving = false
                         dismiss()
+                        dismissWindow(id: "fidelity-login")
                     }
                 }
+                .disabled(isSaving)
                 .keyboardShortcut(.defaultAction)
                 Button("Close") { dismiss() }
             }
             .padding(12)
-            Text("Log in as you normally would, including 2FA. When you see Portfolio or Positions, click Save session. Your password is not stored by this app.")
+            Text("Log in as usual, including 2FA. Wait until Portfolio or Positions is visible, then click Save session. The app reloads that page to capture holdings. Your password is not stored.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -33,6 +39,9 @@ struct FidelityLoginScreen: View {
         }
         .onAppear {
             FidelityEngine.shared.openPositionsPage()
+        }
+        .onDisappear {
+            FidelityEngine.shared.returnWebViewToHost()
         }
     }
 }

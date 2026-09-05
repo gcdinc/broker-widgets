@@ -21,7 +21,7 @@ struct PositionsProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<PositionsEntry>) -> Void) {
         let snapshot = SnapshotStore.load(broker) ?? .setup(broker)
         let entry = PositionsEntry(date: Date(), snapshot: snapshot)
-        let next = Date().addingTimeInterval(AppConstants.widgetReloadInterval)
+        let next = Date().addingTimeInterval(RefreshSettings.seconds)
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 }

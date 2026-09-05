@@ -37,9 +37,10 @@ struct StatusView: View {
         .frame(width: 380)
         .task {
             appState.start()
-        }
-        .onOpenURL { _ in
-            openWindow(id: "main")
+            if appState.showDesktopPanels {
+                openWindow(id: "public-desktop")
+                openWindow(id: "fidelity-desktop")
+            }
         }
     }
 
@@ -48,7 +49,7 @@ struct StatusView: View {
             Text("Broker Widgets")
                 .font(.headline)
             Spacer()
-            Text("every 5 min")
+            Text(RefreshSettings.label)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

@@ -9,26 +9,36 @@
 /* Begin PBXBuildFile section */
 		033091130C156A3509C7DBEF /* PositionsWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 984DD4AC2F5313DD60BE1BD2 /* PositionsWidgetView.swift */; };
 		06C7D61C706E864F35E9C542 /* BrokerWidgetsWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB12725B20A478656BDFC50B /* BrokerWidgetsWidgets.swift */; };
+		0DF6CD24B9F1DBC6721D8FC1 /* PortfolioPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */; };
 		15601906F8CAAC44448C2B48 /* SnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F688566984520E27535C69BB /* SnapshotStore.swift */; };
 		191C2D013359EDC5C1BB1F60 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50368236082021D589B497C2 /* Constants.swift */; };
 		1AFC1071767054E9C179E192 /* MoneyFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47652C9034911847AAD50B5 /* MoneyFormat.swift */; };
+		1C4982E727169933A5A31050 /* RefreshSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */; };
 		1E52FF566F9BF50FDF935CC9 /* BrokerWidgetsWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 60CBBBF7D0EB63A578A5E8CF /* BrokerWidgetsWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20367BB30E62BE796AB82379 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A12A21D969B6015FD21A66 /* KeychainStore.swift */; };
 		271EB34B8D39E73AE699B9BE /* FidelityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */; };
 		292D0B42AAA79103DC3E0E71 /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28BC851CF1D59F5191E9FB /* Position.swift */; };
+		352CDE68F67D0E9E390F6725 /* RefreshSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */; };
 		3F9DDE5CB19E1D90B6A1D755 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50368236082021D589B497C2 /* Constants.swift */; };
 		4635724B996C5425A6105B54 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF2356DCFB22AC2BDE871B13 /* Assets.xcassets */; };
 		46AA95011AA1A67E9FE7F57B /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A083BEAE0034AB05957BF5A /* StatusView.swift */; };
 		583B79899E5A253466586A52 /* PublicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7E552412C6A2F5111645 /* PublicClient.swift */; };
+		58C37A900DCDE115245041EF /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7DEA9AE752D833B4A61905C /* LaunchAtLogin.swift */; };
 		5BD15AB861C8891F5B7FB7BD /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28BC851CF1D59F5191E9FB /* Position.swift */; };
+		665A95CC747BCB554EDB4CD9 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */; };
 		768265A8CDA01D2C341B3550 /* MoneyFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47652C9034911847AAD50B5 /* MoneyFormat.swift */; };
 		8290490D01D17D8700D41D85 /* BrokerKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */; };
 		83650E6E49EE611E4CE60CF0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FC6729684CB1DC2EFCEF81 /* SettingsView.swift */; };
+		8E0BCA1A943059FC3281E0FF /* DesktopPanelWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21A04BE14CF70047D30AA87A /* DesktopPanelWindow.swift */; };
 		98893DA55ED205CB34A0067A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7155E8F937F07B2DEF204155 /* Assets.xcassets */; };
+		BA71ADE2313B886546A99A5B /* FidelityCaptureParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */; };
 		C101FEB56A2F5F311BAFBE43 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */; };
+		C2F1FDC095CAB146365126B9 /* PortfolioPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */; };
 		DB33D84601F481A1AE9F62F6 /* BrokerWidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */; };
 		DC458454C935D65539D27C59 /* SnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F688566984520E27535C69BB /* SnapshotStore.swift */; };
+		E637AF27C83DCF96D38FFBE5 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */; };
 		E9C3BEAACAF563E43F133455 /* FidelityLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD339411F365E5E748F3A411 /* FidelityLoginView.swift */; };
+		EF4A0632C278CE7D8AC11769 /* MarketQuotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */; };
 		F2AB301395044CD04507B924 /* BrokerKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +70,9 @@
 		079D05C61B6BDB3FF7DC7B6E /* BrokerWidgetsWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrokerWidgetsWidgets.entitlements; sourceTree = "<group>"; };
 		0D43B506684421726985D5AB /* BrokerWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrokerWidgets.entitlements; sourceTree = "<group>"; };
 		17A12A21D969B6015FD21A66 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityCaptureParser.swift; sourceTree = "<group>"; };
+		21A04BE14CF70047D30AA87A /* DesktopPanelWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPanelWindow.swift; sourceTree = "<group>"; };
+		3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketQuotes.swift; sourceTree = "<group>"; };
 		4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		4E28BC851CF1D59F5191E9FB /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		50368236082021D589B497C2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -70,10 +83,14 @@
 		8A083BEAE0034AB05957BF5A /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		984DD4AC2F5313DD60BE1BD2 /* PositionsWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionsWidgetView.swift; sourceTree = "<group>"; };
 		9F6613AFF7D0BEF6260666F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		A7DEA9AE752D833B4A61905C /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
+		ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioPanelView.swift; sourceTree = "<group>"; };
 		AF2356DCFB22AC2BDE871B13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerKind.swift; sourceTree = "<group>"; };
 		B47652C9034911847AAD50B5 /* MoneyFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneyFormat.swift; sourceTree = "<group>"; };
+		B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshSettings.swift; sourceTree = "<group>"; };
 		BDC122AA61FA7597C8D619F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettings.swift; sourceTree = "<group>"; };
 		C1BF7E552412C6A2F5111645 /* PublicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicClient.swift; sourceTree = "<group>"; };
 		CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityEngine.swift; sourceTree = "<group>"; };
 		EB12725B20A478656BDFC50B /* BrokerWidgetsWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerWidgetsWidgets.swift; sourceTree = "<group>"; };
@@ -86,6 +103,7 @@
 		0A61B3F14468195A7F4C8619 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				21A04BE14CF70047D30AA87A /* DesktopPanelWindow.swift */,
 				F1FC6729684CB1DC2EFCEF81 /* SettingsView.swift */,
 				8A083BEAE0034AB05957BF5A /* StatusView.swift */,
 			);
@@ -119,6 +137,7 @@
 				7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */,
 				9F6613AFF7D0BEF6260666F0 /* Info.plist */,
 				17A12A21D969B6015FD21A66 /* KeychainStore.swift */,
+				A7DEA9AE752D833B4A61905C /* LaunchAtLogin.swift */,
 				D4AFBB1DE166FD9C44593683 /* Fidelity */,
 				28BBCC37B26DC0628D84DAAA /* Public */,
 				0A61B3F14468195A7F4C8619 /* Views */,
@@ -140,8 +159,11 @@
 			children = (
 				B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */,
 				50368236082021D589B497C2 /* Constants.swift */,
+				BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */,
 				B47652C9034911847AAD50B5 /* MoneyFormat.swift */,
+				ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */,
 				4E28BC851CF1D59F5191E9FB /* Position.swift */,
+				B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */,
 				F688566984520E27535C69BB /* SnapshotStore.swift */,
 			);
 			path = Shared;
@@ -162,8 +184,10 @@
 		D4AFBB1DE166FD9C44593683 /* Fidelity */ = {
 			isa = PBXGroup;
 			children = (
+				182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */,
 				CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */,
 				FD339411F365E5E748F3A411 /* FidelityLoginView.swift */,
+				3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */,
 			);
 			path = Fidelity;
 			sourceTree = "<group>";
@@ -274,12 +298,19 @@
 				8290490D01D17D8700D41D85 /* BrokerKind.swift in Sources */,
 				DB33D84601F481A1AE9F62F6 /* BrokerWidgetsApp.swift in Sources */,
 				191C2D013359EDC5C1BB1F60 /* Constants.swift in Sources */,
+				8E0BCA1A943059FC3281E0FF /* DesktopPanelWindow.swift in Sources */,
+				E637AF27C83DCF96D38FFBE5 /* DisplaySettings.swift in Sources */,
+				BA71ADE2313B886546A99A5B /* FidelityCaptureParser.swift in Sources */,
 				271EB34B8D39E73AE699B9BE /* FidelityEngine.swift in Sources */,
 				E9C3BEAACAF563E43F133455 /* FidelityLoginView.swift in Sources */,
 				20367BB30E62BE796AB82379 /* KeychainStore.swift in Sources */,
+				58C37A900DCDE115245041EF /* LaunchAtLogin.swift in Sources */,
+				EF4A0632C278CE7D8AC11769 /* MarketQuotes.swift in Sources */,
 				768265A8CDA01D2C341B3550 /* MoneyFormat.swift in Sources */,
+				0DF6CD24B9F1DBC6721D8FC1 /* PortfolioPanelView.swift in Sources */,
 				5BD15AB861C8891F5B7FB7BD /* Position.swift in Sources */,
 				583B79899E5A253466586A52 /* PublicClient.swift in Sources */,
+				352CDE68F67D0E9E390F6725 /* RefreshSettings.swift in Sources */,
 				83650E6E49EE611E4CE60CF0 /* SettingsView.swift in Sources */,
 				15601906F8CAAC44448C2B48 /* SnapshotStore.swift in Sources */,
 				46AA95011AA1A67E9FE7F57B /* StatusView.swift in Sources */,
@@ -293,9 +324,12 @@
 				F2AB301395044CD04507B924 /* BrokerKind.swift in Sources */,
 				06C7D61C706E864F35E9C542 /* BrokerWidgetsWidgets.swift in Sources */,
 				3F9DDE5CB19E1D90B6A1D755 /* Constants.swift in Sources */,
+				665A95CC747BCB554EDB4CD9 /* DisplaySettings.swift in Sources */,
 				1AFC1071767054E9C179E192 /* MoneyFormat.swift in Sources */,
+				C2F1FDC095CAB146365126B9 /* PortfolioPanelView.swift in Sources */,
 				292D0B42AAA79103DC3E0E71 /* Position.swift in Sources */,
 				033091130C156A3509C7DBEF /* PositionsWidgetView.swift in Sources */,
+				1C4982E727169933A5A31050 /* RefreshSettings.swift in Sources */,
 				DC458454C935D65539D27C59 /* SnapshotStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -11,6 +11,10 @@ final class AppState: ObservableObject {
     @Published var publicSecretDraft = ""
     @Published var hasPublicSecret = false
     @Published var fidelitySignedIn = false
+    @Published var refreshInterval: TimeInterval
+    @Published var showDesktopPanels: Bool
+    @Published var panelFontScale: Double
+    @Published var launchAtLogin: Bool
 
     private var timer: Timer?
     private var didStart = false
@@ -20,6 +24,18 @@ final class AppState: ObservableObject {
         fidelitySnapshot = SnapshotStore.load(.fidelity) ?? .setup(.fidelity)
         hasPublicSecret = KeychainStore.get(.publicSecret) != nil
         fidelitySignedIn = FidelityEngine.shared.isLikelySignedIn
+        refreshInterval = RefreshSettings.seconds
+        showDesktopPanels = UserDefaults.standard.object(forKey: "showDesktopPanels") as? Bool ?? true
+        panelFontScale = DisplaySettings.fontScale
+        LaunchAtLogin.enableOnFirstLaunchIfNeeded()
+        launchAtLogin = LaunchAtLogin.isEnabled
+        if let loaded = SnapshotStore.load(.fidelity) {
+            let cleaned = cleanedFidelity(loaded)
+            fidelitySnapshot = cleaned
+            if cleaned.totalValue != loaded.totalValue || cleaned.positions.count != loaded.positions.count {
+                try? SnapshotStore.save(cleaned)
+            }
+        }
     }
 
     var menuBarSymbol: String {
@@ -32,22 +48,72 @@ final class AppState: ObservableObject {
     func start() {
         guard !didStart else { return }
         didStart = true
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: AppConstants.refreshInterval, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                await self?.refreshAll()
-            }
-        }
+        rescheduleTimer()
         Task { await refreshAll() }
     }
 
+    func setRefreshInterval(_ seconds: TimeInterval) {
+        refreshInterval = seconds
+        RefreshSettings.seconds = seconds
+        rescheduleTimer()
+        reloadWidgets()
+    }
+
+    func setShowDesktopPanels(_ show: Bool) {
+        showDesktopPanels = show
+        UserDefaults.standard.set(show, forKey: "showDesktopPanels")
+    }
+
+    func setPanelFontScale(_ scale: Double) {
+        panelFontScale = scale
+        DisplaySettings.fontScale = scale
+        reloadWidgets()
+    }
+
+    func setLaunchAtLogin(_ enabled: Bool) {
+        LaunchAtLogin.setEnabled(enabled)
+        launchAtLogin = LaunchAtLogin.isEnabled
+    }
+
+    private func cleanedFidelity(_ snapshot: PortfolioSnapshot) -> PortfolioSnapshot {
+        guard snapshot.status == .ok else { return snapshot }
+        let merged = FidelityCaptureParser.mergeDuplicates(snapshot.positions)
+            .sorted { $0.resolvedMarketValue > $1.resolvedMarketValue }
+        let total = merged.reduce(0) { $0 + $1.resolvedMarketValue }
+        let day = merged.reduce(0) { $0 + $1.dayChangeValue }
+        let prior = total - day
+        var copy = snapshot
+        copy.positions = merged
+        copy.totalValue = snapshot.totalValue > total ? snapshot.totalValue : total
+        if day != 0 {
+            copy.dayChangeValue = day
+            copy.dayChangePercent = prior == 0 ? 0 : (day / prior) * 100
+        }
+        if merged.isEmpty, !snapshot.positions.isEmpty {
+            copy.status = .empty
+            copy.message = "Ignored invalid Fidelity rows (account IDs were parsed as holdings). Refresh Fidelity."
+        }
+        return copy
+    }
+
     func savePublicSecret() throws {
-        let secret = publicSecretDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        let secret = publicSecretDraft
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
         guard !secret.isEmpty else { return }
         try KeychainStore.set(secret, for: .publicSecret)
         KeychainStore.delete(.publicToken)
         publicSecretDraft = ""
         hasPublicSecret = true
+    }
+
+    func savePublicSecretAndRefresh() async {
+        do {
+            try savePublicSecret()
+            await refreshPublic()
+        } catch {
+            lastError = error.localizedDescription
+        }
     }
 
     func clearPublicSecret() {
@@ -91,6 +157,7 @@ final class AppState: ObservableObject {
             publicSnapshot = .setup(.publicBroker)
             try? SnapshotStore.save(publicSnapshot)
             hasPublicSecret = false
+            reloadWidgets()
             return
         }
         hasPublicSecret = true
@@ -102,14 +169,15 @@ final class AppState: ObservableObject {
             publicSnapshot.message = error.localizedDescription
             publicSnapshot.status = .error
             publicSnapshot.updatedAt = Date()
-            try? SnapshotStore.save(publicSnapshot)
             lastError = error.localizedDescription
+            try? SnapshotStore.save(publicSnapshot)
         }
+        reloadWidgets()
     }
 
     func refreshFidelity() async {
         do {
-            let snapshot = try await FidelityEngine.shared.fetchPositions()
+            let snapshot = cleanedFidelity(try await FidelityEngine.shared.fetchPositions())
             fidelitySnapshot = snapshot
             fidelitySignedIn = snapshot.status != .needsSignIn
             try SnapshotStore.save(snapshot)
@@ -117,12 +185,28 @@ final class AppState: ObservableObject {
             fidelitySnapshot.status = .error
             fidelitySnapshot.message = error.localizedDescription
             fidelitySnapshot.updatedAt = Date()
-            try? SnapshotStore.save(fidelitySnapshot)
             lastError = error.localizedDescription
+            try? SnapshotStore.save(fidelitySnapshot)
         }
+        reloadWidgets()
+    }
+
+    private func rescheduleTimer() {
+        timer?.invalidate()
+        let interval = max(refreshInterval, 60)
+        let scheduled = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                await self?.refreshAll()
+            }
+        }
+        scheduled.tolerance = min(60, interval / 10)
+        RunLoop.main.add(scheduled, forMode: .common)
+        timer = scheduled
     }
 
     private func reloadWidgets() {
+        WidgetCenter.shared.reloadTimelines(ofKind: "FidelityPositionsWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "PublicPositionsWidget")
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

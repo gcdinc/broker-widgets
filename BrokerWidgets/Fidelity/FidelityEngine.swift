@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import WebKit
 
@@ -6,6 +7,7 @@ struct CookieRecord: Codable {
 }
 
 enum FidelityWeb {
+    static let summaryURL = URL(string: "https://digital.fidelity.com/ftgw/digital/portfolio/summary")!
     static let positionsURL = URL(string: "https://digital.fidelity.com/ftgw/digital/portfolio/positions")!
     static let storeDefaultsKey = "fidelity.webkit.store.uuid"
 
@@ -19,30 +21,220 @@ enum FidelityWeb {
         return uuid
     }
 
+    static let interceptJavaScript = """
+    (function() {
+      if (window.__brokerHooked) return;
+      window.__brokerHooked = true;
+      window.__brokerCaptured = [];
+      function keep(url, text) {
+        try {
+          var u = String(url || '');
+          var t = String(text || '');
+          if (t.length < 20) return;
+          var first = t.charAt(0);
+          if (first !== '{' && first !== '[') return;
+          if (!/graphql|position|portfolio|balance|holding/i.test(u) && !/symbol|ticker|quantity|qty|holding/i.test(t)) return;
+          window.__brokerCaptured.push({ url: u, text: t.slice(0, 1500000) });
+          if (window.__brokerCaptured.length > 60) window.__brokerCaptured.shift();
+        } catch (e) {}
+      }
+      var origFetch = window.fetch;
+      window.fetch = function() {
+        var url = arguments[0];
+        return origFetch.apply(this, arguments).then(function(res) {
+          try {
+            var href = (typeof url === 'string') ? url : (url && url.url);
+            res.clone().text().then(function(text) { keep(href, text); }).catch(function() {});
+          } catch (e) {}
+          return res;
+        });
+      };
+      var origOpen = XMLHttpRequest.prototype.open;
+      var origSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(method, url) {
+        this.__brokerUrl = url;
+        return origOpen.apply(this, arguments);
+      };
+      XMLHttpRequest.prototype.send = function() {
+        this.addEventListener('load', function() { keep(this.__brokerUrl, this.responseText); });
+        return origSend.apply(this, arguments);
+      };
+    })();
+    """
+
+    /// GraphQL is WAF-blocked. Scrape the visible Positions table and try same-origin REST.
+    static let extractPositionsJavaScript = """
+    function keep(url, text) {
+      try {
+        if (!window.__brokerCaptured) window.__brokerCaptured = [];
+        var t = String(text || '');
+        if (t.length < 20) return;
+        var first = t.charAt(0);
+        if (first !== '{' && first !== '[') return;
+        window.__brokerCaptured.push({ url: String(url || ''), text: t.slice(0, 1500000) });
+        if (window.__brokerCaptured.length > 60) window.__brokerCaptured.shift();
+      } catch (e) {}
+    }
+    function isTicker(sym) {
+      if (!sym) return false;
+      var s = String(sym).trim().toUpperCase();
+      if (!/^[A-Z][A-Z0-9./-]{0,9}$/.test(s)) return false;
+      if (/^Z\\d{6,}$/.test(s) || /^\\d{7,}$/.test(s)) return false;
+      return true;
+    }
+    function signedNum(raw) {
+      var s = String(raw);
+      var neg = /^\\s*[-−]/.test(s) || /\\(.*\\)/.test(s) || /−/.test(s);
+      var n = parseFloat(s.replace(/[^0-9.]/g, ''));
+      if (!isFinite(n)) return 0;
+      return neg ? -n : n;
+    }
+    var rows = [];
+    function addRow(sym, qty, last, mkt, name, day, dayPct) {
+      if (!isTicker(sym) || !(qty > 0 || mkt > 0)) return;
+      rows.push({
+        symbol: String(sym).trim().toUpperCase(),
+        quantity: qty || 0,
+        lastPrice: last || 0,
+        marketVal: mkt || 0,
+        securityDescription: name || String(sym).trim().toUpperCase(),
+        todaysGainLoss: day || 0,
+        todaysGainLossPct: dayPct || 0
+      });
+    }
+    function parseRow(symHint, text) {
+      var t = (text || '').replace(/\\s+/g, ' ').trim();
+      var m = t.match(/^([A-Z][A-Z0-9./-]{0,9})\\b/);
+      var sym = symHint || (m && m[1]);
+      if (!isTicker(sym)) return;
+      var tokens = t.match(/\\(?[-−+]?\\$?[-−+]?[0-9][0-9,]*\\.?[0-9]*%?\\)?/g) || [];
+      var plain = [];
+      var pcts = [];
+      tokens.forEach(function(tok) {
+        var n = signedNum(tok);
+        if (tok.indexOf('%') !== -1) pcts.push(n);
+        else plain.push(n);
+      });
+      if (plain.length < 2) return;
+      var qty = Math.abs(plain[0]);
+      var last = Math.abs(plain[1]);
+      var mkt = plain.length > 2 ? Math.abs(plain[2]) : qty * last;
+      var day = 0;
+      var dayPct = pcts.length ? pcts[0] : 0;
+      if (plain.length > 3) {
+        var fourth = plain[3];
+        if (last > 0 && Math.abs(fourth) <= last * 0.3) {
+          day = qty * fourth;
+          if (!dayPct) dayPct = (fourth / last) * 100;
+        } else {
+          day = fourth;
+          if (!dayPct && mkt) dayPct = (day / (mkt - day)) * 100;
+        }
+      }
+      addRow(sym, qty, last, mkt, '', day, dayPct);
+    }
+    document.querySelectorAll('[data-symbol]').forEach(function(el) {
+      var row = el.closest('tr, [role="row"], [class*="row"]') || el.parentElement;
+      parseRow(el.getAttribute('data-symbol'), row ? row.innerText : '');
+    });
+    document.querySelectorAll('tr, [role="row"], .ag-row').forEach(function(row) {
+      parseRow(null, row.innerText || '');
+    });
+    if (rows.length) {
+      keep('dom:positions', JSON.stringify({ positionDetail: rows }));
+    }
+    var contextText = null;
+    (window.__brokerCaptured || []).forEach(function(c) {
+      if (String(c.url || '').indexOf('GetContext') !== -1) contextText = c.text;
+    });
+    if (!contextText) {
+      try {
+        var cres = await fetch('/ftgw/digital/portfolio/api/GetContext', { credentials: 'include' });
+        contextText = await cres.text();
+        keep('/ftgw/digital/portfolio/api/GetContext', contextText);
+      } catch (e) {}
+    }
+    try {
+      var ctx = JSON.parse(contextText || '{}');
+      var person = (ctx.getContext && ctx.getContext.person) || {};
+      var assets = (person.assets || []).filter(function(a) {
+        return a && a.acctNum && a.acctType !== 'External' && String(a.acctNum).indexOf('-') === -1;
+      });
+      var customerId = (person.customerAttrDetail && person.customerAttrDetail.externalCustomerID) || null;
+      var acctList = assets.map(function(a) {
+        return { acctNum: a.acctNum, acctType: a.acctType, acctSubType: a.acctSubType };
+      });
+      var restURLs = [
+        '/ftgw/digital/portfolio/api/GetPosition',
+        '/ftgw/digital/portfolio/api/positions',
+        '/ftgw/digital/portfolio/api/GetPositions'
+      ];
+      for (var i = 0; i < restURLs.length; i++) {
+        try {
+          var res = await fetch(restURLs[i], {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'content-type': 'application/json', 'accept': 'application/json' },
+            body: JSON.stringify({ acctList: acctList, customerId: customerId })
+          });
+          keep(restURLs[i], await res.text());
+        } catch (e) {}
+      }
+    } catch (e) {}
+    return { rows: rows.length, captured: (window.__brokerCaptured || []).length };
+    """
+
     static func makeConfiguration() -> WKWebViewConfiguration {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore(forIdentifier: dataStoreIdentifier)
         config.defaultWebpagePreferences.allowsContentJavaScript = true
+        let script = WKUserScript(source: interceptJavaScript, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        config.userContentController.addUserScript(script)
         return config
     }
 }
 
+@MainActor
 final class FidelityEngine: NSObject, WKNavigationDelegate {
     static let shared = FidelityEngine()
 
     let webView: WKWebView
+    private let hostWindow: NSWindow
     private var navigationContinuation: CheckedContinuation<Void, Error>?
 
     override init() {
         let config = FidelityWeb.makeConfiguration()
-        webView = WKWebView(frame: .zero, configuration: config)
+        webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 900, height: 700), configuration: config)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 900, height: 700),
+            styleMask: [.borderless],
+            backing: .buffered,
+            defer: false
+        )
+        window.isReleasedWhenClosed = false
+        window.alphaValue = 0
+        window.ignoresMouseEvents = true
+        window.collectionBehavior = [.transient, .ignoresCycle]
+        window.contentView = NSView(frame: window.contentRect(forFrameRect: window.frame))
+        hostWindow = window
         super.init()
         webView.navigationDelegate = self
         webView.customUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+        returnWebViewToHost()
     }
 
     var isLikelySignedIn: Bool {
         KeychainStore.getData(.fidelityCookies) != nil
+    }
+
+    func returnWebViewToHost() {
+        webView.removeFromSuperview()
+        webView.frame = hostWindow.contentView?.bounds ?? webView.frame
+        webView.autoresizingMask = [.width, .height]
+        hostWindow.contentView?.addSubview(webView)
+        if !hostWindow.isVisible {
+            hostWindow.orderBack(nil)
+        }
     }
 
     func openPositionsPage() {
@@ -64,8 +256,7 @@ final class FidelityEngine: NSObject, WKNavigationDelegate {
             encoded["Secure"] = cookie.isSecure ? "TRUE" : "FALSE"
             return CookieRecord(properties: encoded)
         }
-        let data = try JSONEncoder().encode(records)
-        try KeychainStore.setData(data, for: .fidelityCookies)
+        try KeychainStore.setData(try JSONEncoder().encode(records), for: .fidelityCookies)
     }
 
     func restoreCookiesIfNeeded() async {
@@ -89,65 +280,88 @@ final class FidelityEngine: NSObject, WKNavigationDelegate {
 
     func signOut() async {
         KeychainStore.delete(.fidelityCookies)
-        let store = webView.configuration.websiteDataStore
-        let types = WKWebsiteDataStore.allWebsiteDataTypes()
-        await store.removeData(ofTypes: types, modifiedSince: .distantPast)
+        await webView.configuration.websiteDataStore.removeData(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+            modifiedSince: .distantPast
+        )
     }
 
     func fetchPositions() async throws -> PortfolioSnapshot {
+        if webView.superview == nil {
+            returnWebViewToHost()
+        }
         await restoreCookiesIfNeeded()
+        _ = try? await evaluate(FidelityWeb.interceptJavaScript)
+
+        if let current = try? await snapshotFromCurrentPage(), current.status == .ok {
+            try? await persistCookies()
+            return await withStockMoves(current)
+        }
+
+        let href = webView.url?.absoluteString ?? ""
+        let alreadyOnPositions = href.contains("/portfolio/positions") && !href.localizedCaseInsensitiveContains("login")
+        if !alreadyOnPositions {
+            try await load(FidelityWeb.positionsURL)
+            try await Task.sleep(nanoseconds: 5_000_000_000)
+        } else {
+            try await Task.sleep(nanoseconds: 800_000_000)
+        }
+
+        _ = try? await evaluateAsync(FidelityWeb.extractPositionsJavaScript)
+        try? await persistCookies()
+        let extracted = try await snapshotFromCurrentPage()
+        if extracted.status == .ok || isWebViewInLoginUI {
+            return await withStockMoves(extracted)
+        }
+
         try await load(FidelityWeb.positionsURL)
-        try await Task.sleep(nanoseconds: 3_500_000_000)
-        try await persistCookies()
+        try await Task.sleep(nanoseconds: 6_000_000_000)
+        _ = try? await evaluateAsync(FidelityWeb.extractPositionsJavaScript)
+        try? await persistCookies()
+        return await withStockMoves(try await snapshotFromCurrentPage())
+    }
 
-        guard let raw = try await webView.evaluateJavaScript(Self.scrapeJavaScript) else {
-            throw FidelityError.scrapeFailed
+    private func withStockMoves(_ snapshot: PortfolioSnapshot) async -> PortfolioSnapshot {
+        guard snapshot.status == .ok else { return snapshot }
+        var copy = snapshot
+        copy.positions = await MarketQuotes.fillDayChanges(snapshot.positions)
+        return copy
+    }
+
+    private var isWebViewInLoginUI: Bool {
+        webView.window != nil && webView.window !== hostWindow
+    }
+
+    private func snapshotFromCurrentPage() async throws -> PortfolioSnapshot {
+        let page = try await readCapturedPage()
+        return FidelityCaptureParser.snapshot(from: page)
+    }
+
+    private func readCapturedPage() async throws -> CapturedPage {
+        let raw = try await evaluate(Self.readJavaScript)
+        let data: Data
+        if let string = raw as? String, let encoded = string.data(using: .utf8) {
+            data = encoded
+        } else {
+            data = try JSONSerialization.data(withJSONObject: raw as Any)
         }
-        let data = try JSONSerialization.data(withJSONObject: raw)
-        let scraped = try JSONDecoder().decode(FidelityScrapeResult.self, from: data)
+        return try JSONDecoder().decode(CapturedPage.self, from: data)
+    }
 
-        if !scraped.signedIn {
-            return PortfolioSnapshot.setup(.fidelity)
+    private func evaluate(_ script: String) async throws -> Any {
+        try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Any, Error>) in
+            webView.evaluateJavaScript(script) { result, error in
+                if let error {
+                    cont.resume(throwing: error)
+                } else {
+                    cont.resume(returning: result ?? NSNull())
+                }
+            }
         }
+    }
 
-        let positions: [Position] = scraped.positions.compactMap { row in
-            let symbol = row.symbol.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-            guard !symbol.isEmpty else { return nil }
-            let qty = row.quantity ?? 0
-            let last = row.lastPrice ?? 0
-            let value = (row.marketValue ?? 0) == 0 ? qty * last : (row.marketValue ?? 0)
-            return Position(
-                symbol: symbol,
-                name: row.name ?? symbol,
-                quantity: qty,
-                lastPrice: last,
-                marketValue: value,
-                dayChangeValue: row.dayChangeValue ?? 0,
-                dayChangePercent: row.dayChangePercent ?? 0
-            )
-        }
-        .sorted { $0.resolvedMarketValue > $1.resolvedMarketValue }
-
-        let dayChange = positions.reduce(0) { $0 + $1.dayChangeValue }
-        var total = scraped.totalValue ?? 0
-        if total == 0 {
-            total = positions.reduce(0) { $0 + $1.resolvedMarketValue }
-        }
-        let prior = total - dayChange
-        let dayPct = prior == 0 ? 0 : (dayChange / prior) * 100
-
-        let status: SnapshotStatus = positions.isEmpty ? .empty : .ok
-        return PortfolioSnapshot(
-            broker: .fidelity,
-            updatedAt: Date(),
-            totalValue: total,
-            dayChangeValue: dayChange,
-            dayChangePercent: dayPct,
-            cash: nil,
-            positions: positions,
-            status: status,
-            message: positions.isEmpty ? "Signed in, but no positions were found on the page." : nil
-        )
+    private func evaluateAsync(_ script: String) async throws -> Any {
+        try await webView.callAsyncJavaScript(script, arguments: [:], in: nil, in: .page) ?? NSNull()
     }
 
     private func load(_ url: URL) async throws {
@@ -189,136 +403,41 @@ final class FidelityEngine: NSObject, WKNavigationDelegate {
         }
     }
 
-    private static let scrapeJavaScript = """
-    (() => {
-      const href = location.href || '';
-      const hasPassword = Boolean(document.querySelector('input[type="password"]'));
-      const signedIn = !/\\/login/i.test(href) && !hasPassword;
-
-      const parseMoney = (s) => {
-        if (s === null || s === undefined) return null;
-        const str = String(s);
-        const neg = /\\(.*\\)/.test(str) || /^\\s*-/.test(str);
-        const n = parseFloat(str.replace(/[^0-9.]/g, ''));
-        if (Number.isNaN(n)) return null;
-        return neg ? -Math.abs(n) : n;
-      };
-
-      const positions = [];
-      const seen = new Set();
-      const add = (p) => {
-        if (!p || !p.symbol) return;
-        const symbol = String(p.symbol).trim().toUpperCase();
-        if (!/^[A-Z][A-Z0-9./^-]{0,20}$/.test(symbol)) return;
-        if (seen.has(symbol)) return;
-        seen.add(symbol);
-        positions.push({
-          symbol,
-          name: p.name || symbol,
-          quantity: Number(p.quantity) || 0,
-          lastPrice: Number(p.lastPrice) || 0,
-          marketValue: Number(p.marketValue) || 0,
-          dayChangeValue: Number(p.dayChangeValue) || 0,
-          dayChangePercent: Number(p.dayChangePercent) || 0
-        });
-      };
-
-      const walk = (node) => {
-        if (!node) return;
-        if (Array.isArray(node)) { node.forEach(walk); return; }
-        if (typeof node !== 'object') return;
-        const symbol = node.symbol || node.ticker || node.underlyingSymbol || node.optionSymbol;
-        const qty = node.quantity ?? node.qty ?? node.shares ?? node.shareQuantity ?? node.quantityLong;
-        const last = node.lastPrice ?? node.price ?? node.currentPrice ?? node.last ?? node.mark;
-        const value = node.marketValue ?? node.currentValue ?? node.mktValue ?? node.value ?? node.marketVal;
-        if (symbol && (qty != null || value != null)) {
-          add({
-            symbol,
-            name: node.description || node.name || node.securityDescription || node.longName,
-            quantity: parseMoney(qty) ?? Number(qty),
-            lastPrice: parseMoney(last) ?? Number(last),
-            marketValue: parseMoney(value) ?? Number(value),
-            dayChangeValue: parseMoney(node.todayGainLoss ?? node.dayChange ?? node.change ?? node.todaysGainLossDollar) || 0,
-            dayChangePercent: parseMoney(node.todayGainLossPercent ?? node.dayChangePercent ?? node.todaysGainLossPercent) || 0
-          });
-        }
-        Object.values(node).forEach(walk);
-      };
-
-      document.querySelectorAll('script').forEach((script) => {
-        const t = script.textContent || '';
-        if (t.length < 40 || t.length > 4000000) return;
-        const idx = t.indexOf('{');
-        if (idx < 0) return;
-        try { walk(JSON.parse(t.slice(idx))); } catch (e) {}
-      });
-
-      document.querySelectorAll('table tbody tr, [role="row"]').forEach((tr) => {
-        const cells = [...tr.querySelectorAll('td, [role="gridcell"], [role="cell"]')]
-          .map((c) => (c.innerText || '').trim())
-          .filter(Boolean);
-        if (cells.length < 3) return;
-        const symbolCell = cells.find((c) => /^[A-Z]{1,6}([./-][A-Z0-9]+)?$/.test(c.split('\\n')[0].trim()));
-        if (!symbolCell) return;
-        const symbol = symbolCell.split('\\n')[0].trim();
-        const nums = cells.map(parseMoney).filter((n) => n !== null);
-        add({
-          symbol,
-          name: cells[1] || symbol,
-          quantity: nums[0] || 0,
-          lastPrice: nums[1] || 0,
-          marketValue: nums[2] || 0,
-          dayChangeValue: nums[3] || 0,
-          dayChangePercent: nums[4] || 0
-        });
-      });
-
-      document.querySelectorAll('[data-symbol], [data-ticker]').forEach((el) => {
-        add({
-          symbol: el.getAttribute('data-symbol') || el.getAttribute('data-ticker'),
-          name: el.getAttribute('data-name') || (el.innerText || '').trim(),
-          quantity: parseMoney(el.getAttribute('data-quantity') || '') || 0,
-          lastPrice: parseMoney(el.getAttribute('data-price') || '') || 0,
-          marketValue: parseMoney(el.getAttribute('data-value') || '') || 0,
-          dayChangeValue: 0,
-          dayChangePercent: 0
-        });
-      });
-
-      let totalValue = 0;
-      const bodyText = document.body ? document.body.innerText : '';
-      const totalMatch = bodyText.match(/Total Account Value[^$]*\\$([0-9,]+(?:\\.[0-9]+)?)/i)
-        || bodyText.match(/Account (?:total|value)[^$]*\\$([0-9,]+(?:\\.[0-9]+)?)/i);
-      if (totalMatch) totalValue = parseMoney(totalMatch[0]) || 0;
-      if (!totalValue) totalValue = positions.reduce((sum, p) => sum + (p.marketValue || 0), 0);
-
-      return { signedIn, url: href, title: document.title, totalValue, positions };
-    })()
+    private static let readJavaScript = """
+    JSON.stringify({
+      href: location.href || '',
+      title: document.title || '',
+      hasPassword: Boolean(document.querySelector('input[type="password"]')),
+      captured: (window.__brokerCaptured || []).map(function(c) { return { url: c.url, text: c.text }; }),
+      text: (document.body && document.body.innerText) ? document.body.innerText.slice(0, 100000) : ''
+    })
     """
 }
 
-private struct FidelityScrapeResult: Decodable {
-    var signedIn: Bool
-    var url: String?
+struct CapturedPage: Decodable {
+    var href: String
     var title: String?
-    var totalValue: Double?
-    var positions: [FidelityScrapePosition]
+    var hasPassword: Bool
+    var captured: [CapturedNetwork]
+    var text: String?
 }
 
-private struct FidelityScrapePosition: Decodable {
-    var symbol: String
-    var name: String?
-    var quantity: Double?
-    var lastPrice: Double?
-    var marketValue: Double?
-    var dayChangeValue: Double?
-    var dayChangePercent: Double?
+struct CapturedNetwork: Decodable {
+    var url: String?
+    var text: String?
 }
+
 
 enum FidelityError: LocalizedError {
     case scrapeFailed
+    case fetchFailed(String)
 
     var errorDescription: String? {
-        "Fidelity positions page did not return any data. Try signing in again."
+        switch self {
+        case .scrapeFailed:
+            return "Fidelity positions page did not return any data. Try signing in again."
+        case .fetchFailed(let message):
+            return message
+        }
     }
 }
