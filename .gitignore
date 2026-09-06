@@ -40,11 +40,16 @@ public-token.json
 .DS_Store
 .AppleDouble
 .LSOverride
-IconThumbs.db
+Icon
+Thumbs.db
 
 # Swift / SPM
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .build/
+
+# Local download scratch
+.tmp-latest-zip/
+publish/
 
 # IDEs
 .idea/

@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 private enum PositionSortColumn: String, CaseIterable {
@@ -74,17 +75,9 @@ struct PortfolioPanelView: View {
                 }
             }
             if showsClose {
-                Button {
-                    onClose?()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(scaled(11, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .padding(6)
-                        .background(.quaternary.opacity(0.5), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .help("Close")
+                PanelCloseButton(action: { onClose?() })
+                    .frame(width: 24, height: 24)
+                    .help("Close")
             }
         }
     }
@@ -230,4 +223,36 @@ func pnlColor(_ value: Double) -> Color {
     if value > 0 { return .green }
     if value < 0 { return .red }
     return .secondary
+}
+
+/// Real NSButton so window-drag (`isMovableByWindowBackground`) does not swallow the click.
+struct PanelCloseButton: NSViewRepresentable {
+    var action: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    func makeNSView(context: Context) -> NSButton {
+        let button = NSButton(frame: NSRect(x: 0, y: 0, width: 24, height: 24))
+        button.title = ""
+        button.bezelStyle = .circular
+        button.isBordered = false
+        button.image = NSImage(systemSymbolName: "xmark", accessibilityDescription: "Close")
+        button.imagePosition = .imageOnly
+        button.contentTintColor = .secondaryLabelColor
+        button.target = context.coordinator
+        button.action = #selector(Coordinator.tap)
+        return button
+    }
+
+    func updateNSView(_ nsView: NSButton, context: Context) {
+        context.coordinator.action = action
+    }
+
+    final class Coordinator: NSObject {
+        var action: () -> Void
+        init(action: @escaping () -> Void) { self.action = action }
+        @objc func tap() { action() }
+    }
 }

@@ -12,29 +12,35 @@ final class AppState: ObservableObject {
     @Published var hasPublicSecret = false
     @Published var fidelitySignedIn = false
     @Published var refreshInterval: TimeInterval
-    @Published var showDesktopPanels: Bool
+    @Published var showFidelityPanel: Bool
+    @Published var showPublicPanel: Bool
     @Published var panelFontScale: Double
     @Published var launchAtLogin: Bool
+    @Published var autoUpdateEnabled: Bool
+    @Published var updateStatus: AppUpdateStatus = .idle
+    @Published var isUpdating = false
 
     private var timer: Timer?
+    private var updateTimer: Timer?
     private var didStart = false
 
     init() {
         publicSnapshot = SnapshotStore.load(.publicBroker) ?? .setup(.publicBroker)
-        fidelitySnapshot = SnapshotStore.load(.fidelity) ?? .setup(.fidelity)
-        hasPublicSecret = KeychainStore.get(.publicSecret) != nil
-        fidelitySignedIn = FidelityEngine.shared.isLikelySignedIn
+        let loadedFidelity = SnapshotStore.load(.fidelity) ?? .setup(.fidelity)
+        let cleaned = Self.cleanedFidelity(loadedFidelity)
+        fidelitySnapshot = cleaned
         refreshInterval = RefreshSettings.seconds
-        showDesktopPanels = UserDefaults.standard.object(forKey: "showDesktopPanels") as? Bool ?? true
+        let both = UserDefaults.standard.object(forKey: "showDesktopPanels") as? Bool ?? true
+        showFidelityPanel = UserDefaults.standard.object(forKey: "showFidelityPanel") as? Bool ?? both
+        showPublicPanel = UserDefaults.standard.object(forKey: "showPublicPanel") as? Bool ?? both
         panelFontScale = DisplaySettings.fontScale
         LaunchAtLogin.enableOnFirstLaunchIfNeeded()
         launchAtLogin = LaunchAtLogin.isEnabled
-        if let loaded = SnapshotStore.load(.fidelity) {
-            let cleaned = cleanedFidelity(loaded)
-            fidelitySnapshot = cleaned
-            if cleaned.totalValue != loaded.totalValue || cleaned.positions.count != loaded.positions.count {
-                try? SnapshotStore.save(cleaned)
-            }
+        autoUpdateEnabled = AppUpdateSettings.isEnabled
+        hasPublicSecret = KeychainStore.get(.publicSecret) != nil
+        fidelitySignedIn = FidelityEngine.shared.isLikelySignedIn
+        if cleaned.totalValue != loadedFidelity.totalValue || cleaned.positions.count != loadedFidelity.positions.count {
+            try? SnapshotStore.save(cleaned)
         }
     }
 
@@ -46,7 +52,22 @@ final class AppState: ObservableObject {
         guard !didStart else { return }
         didStart = true
         rescheduleTimer()
+        scheduleUpdateChecks()
         Task { await refreshAll() }
+        Task { await checkForAppUpdate(installIfAvailable: autoUpdateEnabled) }
+    }
+
+    var lastHoldingsUpdate: Date? {
+        let snapshots = [publicSnapshot, fidelitySnapshot]
+        let dates = snapshots.compactMap { snapshot -> Date? in
+            switch snapshot.status {
+            case .ok, .error, .empty:
+                return snapshot.updatedAt
+            case .needsSignIn, .needsSecret:
+                return nil
+            }
+        }
+        return dates.max()
     }
 
     func setRefreshInterval(_ seconds: TimeInterval) {
@@ -56,9 +77,22 @@ final class AppState: ObservableObject {
         reloadWidgets()
     }
 
-    func setShowDesktopPanels(_ show: Bool) {
-        showDesktopPanels = show
-        UserDefaults.standard.set(show, forKey: "showDesktopPanels")
+    func resetRefreshInterval() {
+        setRefreshInterval(RefreshSettings.defaultSeconds)
+    }
+
+    func setPanelVisible(_ windowID: String, _ show: Bool) {
+        switch windowID {
+        case "fidelity-desktop":
+            showFidelityPanel = show
+            UserDefaults.standard.set(show, forKey: "showFidelityPanel")
+        case "public-desktop":
+            showPublicPanel = show
+            UserDefaults.standard.set(show, forKey: "showPublicPanel")
+        default:
+            break
+        }
+        UserDefaults.standard.set(showFidelityPanel || showPublicPanel, forKey: "showDesktopPanels")
     }
 
     func setPanelFontScale(_ scale: Double) {
@@ -72,19 +106,42 @@ final class AppState: ObservableObject {
         launchAtLogin = LaunchAtLogin.isEnabled
     }
 
-    private func cleanedFidelity(_ snapshot: PortfolioSnapshot) -> PortfolioSnapshot {
+    func setAutoUpdate(_ enabled: Bool) {
+        autoUpdateEnabled = enabled
+        AppUpdateSettings.isEnabled = enabled
+        if enabled {
+            Task { await checkForAppUpdate(installIfAvailable: true) }
+        }
+    }
+
+    func checkForAppUpdate(installIfAvailable: Bool) async {
+        guard !isUpdating else { return }
+        isUpdating = true
+        updateStatus = .checking
+        do {
+            updateStatus = try await AppUpdate.check(installIfAvailable: installIfAvailable) { [weak self] status in
+                Task { @MainActor in
+                    self?.updateStatus = status
+                }
+            }
+        } catch {
+            updateStatus = .failed(error.localizedDescription)
+        }
+        isUpdating = false
+    }
+
+    private static func cleanedFidelity(_ snapshot: PortfolioSnapshot) -> PortfolioSnapshot {
         guard snapshot.status == .ok else { return snapshot }
-        let merged = FidelityCaptureParser.mergeDuplicates(snapshot.positions)
+        let merged = FidelityHoldingRules.mergeDuplicates(snapshot.positions)
             .sorted { $0.resolvedMarketValue > $1.resolvedMarketValue }
         let total = merged.reduce(0) { $0 + $1.resolvedMarketValue }
         let day = merged.reduce(0) { $0 + $1.dayChangeValue }
-        let prior = total - day
         var copy = snapshot
         copy.positions = merged
         copy.totalValue = snapshot.totalValue > total ? snapshot.totalValue : total
         if day != 0 {
             copy.dayChangeValue = day
-            copy.dayChangePercent = prior == 0 ? 0 : (day / prior) * 100
+            copy.dayChangePercent = Position.dayPercent(change: day, value: total)
         }
         if merged.isEmpty, !snapshot.positions.isEmpty {
             copy.status = .empty
@@ -140,6 +197,13 @@ final class AppState: ObservableObject {
         reloadWidgets()
     }
 
+    func clearAllSecrets() async {
+        publicSecretDraft = ""
+        lastError = nil
+        clearPublicSecret()
+        await signOutFidelity()
+    }
+
     func refreshAll() async {
         isRefreshing = true
         lastError = nil
@@ -174,7 +238,7 @@ final class AppState: ObservableObject {
 
     func refreshFidelity() async {
         do {
-            let snapshot = cleanedFidelity(try await FidelityEngine.shared.fetchPositions())
+            let snapshot = Self.cleanedFidelity(try await FidelityEngine.shared.fetchPositions())
             fidelitySnapshot = snapshot
             fidelitySignedIn = snapshot.status != .needsSignIn
             try SnapshotStore.save(snapshot)
@@ -186,6 +250,18 @@ final class AppState: ObservableObject {
             try? SnapshotStore.save(fidelitySnapshot)
         }
         reloadWidgets()
+    }
+
+    private func scheduleUpdateChecks() {
+        updateTimer?.invalidate()
+        let scheduled = Timer(timeInterval: 12 * 60 * 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                await self.checkForAppUpdate(installIfAvailable: self.autoUpdateEnabled)
+            }
+        }
+        RunLoop.main.add(scheduled, forMode: .common)
+        updateTimer = scheduled
     }
 
     private func rescheduleTimer() {
@@ -202,8 +278,6 @@ final class AppState: ObservableObject {
     }
 
     private func reloadWidgets() {
-        WidgetCenter.shared.reloadTimelines(ofKind: "FidelityPositionsWidget")
-        WidgetCenter.shared.reloadTimelines(ofKind: "PublicPositionsWidget")
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

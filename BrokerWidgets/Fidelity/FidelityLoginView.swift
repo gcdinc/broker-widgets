@@ -10,7 +10,7 @@ struct FidelityLoginScreen: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Sign in to Fidelity")
+                Text(appState.fidelitySignedIn ? "Fidelity session" : "Sign in to Fidelity")
                     .font(.headline)
                 Spacer()
                 Button(isSaving ? "Saving…" : "Save session & load positions") {
@@ -24,10 +24,18 @@ struct FidelityLoginScreen: View {
                 }
                 .disabled(isSaving)
                 .keyboardShortcut(.defaultAction)
-                Button("Close") { dismiss() }
+                Button("Close") {
+                    dismiss()
+                    dismissWindow(id: "fidelity-login")
+                    NSApplication.shared.windows
+                        .filter { $0.title == "Fidelity Sign In" }
+                        .forEach { $0.close() }
+                }
             }
             .padding(12)
-            Text("Log in as usual, including 2FA. Wait until Portfolio or Positions is visible, then click Save session. The app reloads that page to capture holdings. Your password is not stored.")
+            Text(appState.fidelitySignedIn
+                 ? "You're already signed in. Positions should appear here — click Save session to store cookies again. Your password is not stored."
+                 : "Log in as usual, including 2FA. Wait until Portfolio or Positions is visible, then click Save session. Your password is not stored.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -37,8 +45,8 @@ struct FidelityLoginScreen: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6))
                 .padding([.horizontal, .bottom], 12)
         }
-        .onAppear {
-            FidelityEngine.shared.openPositionsPage()
+        .task {
+            await FidelityEngine.shared.prepareLoginPage()
         }
         .onDisappear {
             FidelityEngine.shared.returnWebViewToHost()

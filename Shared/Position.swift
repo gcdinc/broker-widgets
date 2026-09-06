@@ -8,8 +8,6 @@ struct Position: Codable, Identifiable, Hashable {
     var marketValue: Double
     var dayChangeValue: Double
     var dayChangePercent: Double
-    var totalGainValue: Double?
-    var totalGainPercent: Double?
     var accountId: String?
     var accountName: String?
 
@@ -34,9 +32,14 @@ struct Position: Codable, Identifiable, Hashable {
 
     var resolvedDayChangePercent: Double {
         if dayChangePercent != 0 { return dayChangePercent }
-        let prior = resolvedMarketValue - dayChangeValue
-        guard prior != 0, dayChangeValue != 0 else { return 0 }
-        return (dayChangeValue / prior) * 100
+        return Self.dayPercent(change: dayChangeValue, value: resolvedMarketValue)
+    }
+
+    static func dayPercent(change: Double, value: Double, explicit: Double = 0) -> Double {
+        if explicit != 0 { return explicit }
+        let prior = value - change
+        guard change != 0, prior != 0 else { return 0 }
+        return (change / prior) * 100
     }
 
     /// Bonds from Public.com use a CUSIP as `symbol` (e.g. 03770DAD5). Show the coupon name instead.

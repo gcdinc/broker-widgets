@@ -37,8 +37,10 @@ struct StatusView: View {
         .frame(width: 380)
         .task {
             appState.start()
-            if appState.showDesktopPanels {
+            if appState.showPublicPanel {
                 openWindow(id: "public-desktop")
+            }
+            if appState.showFidelityPanel {
                 openWindow(id: "fidelity-desktop")
             }
         }
@@ -81,7 +83,7 @@ struct BrokerStatusCard: View {
                     Spacer()
                     Text("\(MoneyFormat.signedUsd(snapshot.dayChangeValue))  \(MoneyFormat.percent(snapshot.dayChangePercent))")
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(changeColor(snapshot.dayChangeValue))
+                        .foregroundStyle(pnlColor(snapshot.dayChangeValue))
                 }
                 Text("\(snapshot.positions.count) positions")
                     .font(.caption)
@@ -97,8 +99,3 @@ struct BrokerStatusCard: View {
     }
 }
 
-func changeColor(_ value: Double) -> Color {
-    if value > 0 { return .green }
-    if value < 0 { return .red }
-    return .secondary
-}

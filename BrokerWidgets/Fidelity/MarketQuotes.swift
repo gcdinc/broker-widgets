@@ -20,19 +20,32 @@ enum MarketQuotes {
             }
         }
 
-        return positions.map { position in
+        return applyQuotes(positions, quotes)
+    }
+
+    static func applyQuotes(
+        _ positions: [Position],
+        _ quotes: [String: (change: Double, percent: Double)]
+    ) -> [Position] {
+        positions.map { position in
             guard position.dayChangePercent == 0, let quote = quotes[position.symbol] else {
                 return position
             }
             var copy = position
             copy.dayChangePercent = quote.percent
-            if position.quantity != 0, quote.change != 0 {
-                copy.dayChangeValue = position.quantity * quote.change
-            } else {
-                copy.dayChangeValue = position.resolvedMarketValue * quote.percent / 100
-            }
+            copy.dayChangeValue = quotedDayChange(position, quote)
             return copy
         }
+    }
+
+    private static func quotedDayChange(
+        _ position: Position,
+        _ quote: (change: Double, percent: Double)
+    ) -> Double {
+        if position.quantity != 0, quote.change != 0 {
+            return position.quantity * quote.change
+        }
+        return position.resolvedMarketValue * quote.percent / 100
     }
 
     private static func quote(for symbol: String) async -> (String, Double, Double)? {
@@ -58,23 +71,33 @@ enum MarketQuotes {
         return nil
     }
 
-    private static func parseChart(_ json: [String: Any]) -> (change: Double, percent: Double)? {
+    static func parseChart(_ json: [String: Any]) -> (change: Double, percent: Double)? {
         let chart = json["chart"] as? [String: Any] ?? [:]
         let result = (chart["result"] as? [Any])?.first as? [String: Any] ?? [:]
         let meta = result["meta"] as? [String: Any] ?? [:]
-        let price = number(meta["regularMarketPrice"])
-        let previous = number(meta["chartPreviousClose"]) != 0
-            ? number(meta["chartPreviousClose"])
-            : number(meta["previousClose"])
-        if let change = meta["regularMarketChange"] as? NSNumber,
-           let percent = meta["regularMarketChangePercent"] as? NSNumber {
-            return (change.doubleValue, percent.doubleValue)
+        if let fromMeta = metaMove(meta) { return fromMeta }
+        if let fromPrice = priceMove(meta) { return fromPrice }
+        return closeMove(dailyCloses(result))
+    }
+
+    private static func metaMove(_ meta: [String: Any]) -> (change: Double, percent: Double)? {
+        guard let change = meta["regularMarketChange"] as? NSNumber,
+              let percent = meta["regularMarketChangePercent"] as? NSNumber else {
+            return nil
         }
-        if price != 0, previous != 0 {
-            let change = price - previous
-            return (change, (change / previous) * 100)
-        }
-        let closes = dailyCloses(result)
+        return (change.doubleValue, percent.doubleValue)
+    }
+
+    private static func priceMove(_ meta: [String: Any]) -> (change: Double, percent: Double)? {
+        let price = JSONValue.number(meta["regularMarketPrice"])
+        let previous = JSONValue.number(meta["chartPreviousClose"])
+        let close = previous != 0 ? previous : JSONValue.number(meta["previousClose"])
+        guard price != 0, close != 0 else { return nil }
+        let change = price - close
+        return (change, (change / close) * 100)
+    }
+
+    private static func closeMove(_ closes: [Double]) -> (change: Double, percent: Double)? {
         guard closes.count >= 2 else { return nil }
         let last = closes[closes.count - 1]
         let prior = closes[closes.count - 2]
@@ -89,16 +112,8 @@ enum MarketQuotes {
         let closes = quote["close"] as? [Any] ?? []
         return closes.compactMap { value -> Double? in
             if value is NSNull { return nil }
-            let number = number(value)
-            return number == 0 ? nil : number
+            let parsed = JSONValue.number(value)
+            return parsed == 0 ? nil : parsed
         }
-    }
-
-    private static func number(_ raw: Any?) -> Double {
-        if let number = raw as? NSNumber { return number.doubleValue }
-        if let value = raw as? Double { return value }
-        if let value = raw as? Int { return Double(value) }
-        if let value = raw as? String { return Double(value) ?? 0 }
-        return 0
     }
 }

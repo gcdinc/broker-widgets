@@ -19,36 +19,16 @@ enum PublicClient {
         var accountMoves: [AccountDayMove] = []
 
         for account in accounts {
-            let url = URL(string: "https://api.public.com/userapigateway/trading/\(account.id)/portfolio/v2")!
-            let portfolio = try await requestJSON(url, token: token)
-            totalValue += JSONNumber.double(portfolio["totalAccountValue"])
-            cash += JSONNumber.double(portfolio["cash"])
-            let type = (portfolio["accountType"] as? String) ?? account.type
-            let name = PublicAccount.displayName(type: type, brokerageType: account.brokerageType)
-            let rows = portfolio["positions"] as? [Any] ?? []
-            var accountDay = 0.0
-            var accountValue = 0.0
-            for row in rows {
-                guard var position = parsePosition(row, accountId: account.id) else { continue }
-                position.accountName = name
-                allPositions.append(position)
-                dayChange += position.dayChangeValue
-                accountDay += position.dayChangeValue
-                accountValue += position.resolvedMarketValue
-            }
-            let prior = accountValue - accountDay
-            accountMoves.append(
-                AccountDayMove(
-                    accountId: account.id,
-                    dayChangeValue: accountDay,
-                    dayChangePercent: prior == 0 ? 0 : (accountDay / prior) * 100
-                )
-            )
+            let loaded = try await loadPortfolio(account, token: token)
+            allPositions.append(contentsOf: loaded.positions)
+            totalValue += loaded.value
+            cash += loaded.cash
+            dayChange += loaded.day
+            accountMoves.append(loaded.move)
         }
 
         allPositions.sort { $0.resolvedMarketValue > $1.resolvedMarketValue }
-        let prior = totalValue - dayChange
-        let dayPct = prior == 0 ? 0 : (dayChange / prior) * 100
+        let dayPct = Position.dayPercent(change: dayChange, value: totalValue)
         let status: SnapshotStatus = allPositions.isEmpty && totalValue == 0 ? .empty : .ok
         return PortfolioSnapshot(
             broker: .publicBroker,
@@ -109,13 +89,20 @@ enum PublicClient {
 
         let (data, response) = try await URLSession.shared.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        let text = String(data: data, encoding: .utf8) ?? ""
+        try throwIfFailed(status: status, body: String(data: data, encoding: .utf8) ?? "")
+        return try decodeObject(data, status: status)
+    }
+
+    private static func throwIfFailed(status: Int, body: String) throws {
         guard (200..<300).contains(status) else {
             if status == 401 {
                 KeychainStore.delete(.publicToken)
             }
-            throw PublicClientError.http(status, text)
+            throw PublicClientError.http(status, body)
         }
+    }
+
+    private static func decodeObject(_ data: Data, status: Int) throws -> [String: Any] {
         let parsed = try JSONSerialization.jsonObject(with: data)
         if let object = parsed as? [String: Any] {
             return object
@@ -141,6 +128,35 @@ enum PublicClient {
         }
     }
 
+    private static func loadPortfolio(_ account: PublicAccount, token: String) async throws -> LoadedPortfolio {
+        let url = URL(string: "https://api.public.com/userapigateway/trading/\(account.id)/portfolio/v2")!
+        let portfolio = try await requestJSON(url, token: token)
+        let type = (portfolio["accountType"] as? String) ?? account.type
+        let name = PublicAccountName.display(type: type, brokerageType: account.brokerageType)
+        let rows = portfolio["positions"] as? [Any] ?? []
+        var positions: [Position] = []
+        var accountDay = 0.0
+        var accountValue = 0.0
+        for row in rows {
+            guard var position = parsePosition(row, accountId: account.id) else { continue }
+            position.accountName = name
+            positions.append(position)
+            accountDay += position.dayChangeValue
+            accountValue += position.resolvedMarketValue
+        }
+        return LoadedPortfolio(
+            positions: positions,
+            value: JSONValue.number(portfolio["totalAccountValue"]),
+            cash: JSONValue.number(portfolio["cash"]),
+            day: accountDay,
+            move: AccountDayMove(
+                accountId: account.id,
+                dayChangeValue: accountDay,
+                dayChangePercent: Position.dayPercent(change: accountDay, value: accountValue)
+            )
+        )
+    }
+
     private static func parsePosition(_ raw: Any, accountId: String) -> Position? {
         guard let object = raw as? [String: Any] else { return nil }
         let instrument = object["instrument"] as? [String: Any] ?? [:]
@@ -150,23 +166,43 @@ enum PublicClient {
         }
         let lastPriceObject = object["lastPrice"] as? [String: Any]
         let daily = object["positionDailyGain"] as? [String: Any]
-        let cost = object["costBasis"] as? [String: Any]
-        let instrumentGain = object["instrumentGain"] as? [String: Any]
-        let qty = JSONNumber.double(object["quantity"])
-        let last = JSONNumber.double(lastPriceObject?["lastPrice"] ?? object["lastPrice"])
-        let value = JSONNumber.double(object["currentValue"])
+        let qty = JSONValue.number(object["quantity"])
+        let last = JSONValue.number(lastPriceObject?["lastPrice"] ?? object["lastPrice"])
+        let value = JSONValue.number(object["currentValue"])
         return Position(
             symbol: symbol,
             name: (instrument["name"] as? String) ?? symbol,
             quantity: qty,
             lastPrice: last,
             marketValue: value == 0 ? qty * last : value,
-            dayChangeValue: JSONNumber.double(daily?["gainValue"]),
-            dayChangePercent: JSONNumber.double(daily?["gainPercentage"]),
-            totalGainValue: JSONNumber.double(cost?["gainValue"] ?? instrumentGain?["gainValue"]),
-            totalGainPercent: JSONNumber.double(cost?["gainPercentage"] ?? instrumentGain?["gainPercentage"]),
+            dayChangeValue: JSONValue.number(daily?["gainValue"]),
+            dayChangePercent: JSONValue.number(daily?["gainPercentage"]),
             accountId: accountId
         )
+    }
+}
+
+enum PublicAccountName {
+    private static let labels = [
+        "BOND_ACCOUNT": "Bonds",
+        "HIGH_YIELD": "High yield",
+        "TREASURY": "Treasury",
+        "TRADITIONAL_IRA": "Traditional IRA",
+        "ROTH_IRA": "Roth IRA",
+        "ENTITY": "Entity",
+        "RIA_ASSET": "Managed"
+    ]
+
+    static func display(type: String?, brokerageType: String?) -> String {
+        let raw = type?.uppercased()
+        if raw == "BROKERAGE" {
+            return brokerageType?.uppercased() == "MARGIN" ? "Brokerage · Margin" : "Brokerage"
+        }
+        if let raw, let label = labels[raw] { return label }
+        if let type, !type.isEmpty {
+            return type.replacingOccurrences(of: "_", with: " ").capitalized
+        }
+        return "Account"
     }
 }
 
@@ -174,50 +210,19 @@ private struct PublicAccount {
     var id: String
     var type: String?
     var brokerageType: String?
+}
 
-    static func displayName(type: String?, brokerageType: String?) -> String {
-        switch type?.uppercased() {
-        case "BROKERAGE":
-            if brokerageType?.uppercased() == "MARGIN" { return "Brokerage · Margin" }
-            return "Brokerage"
-        case "BOND_ACCOUNT":
-            return "Bonds"
-        case "HIGH_YIELD":
-            return "High yield"
-        case "TREASURY":
-            return "Treasury"
-        case "TRADITIONAL_IRA":
-            return "Traditional IRA"
-        case "ROTH_IRA":
-            return "Roth IRA"
-        case "ENTITY":
-            return "Entity"
-        case "RIA_ASSET":
-            return "Managed"
-        case let raw?:
-            return raw.replacingOccurrences(of: "_", with: " ").capitalized
-        default:
-            return "Account"
-        }
-    }
+private struct LoadedPortfolio {
+    var positions: [Position]
+    var value: Double
+    var cash: Double
+    var day: Double
+    var move: AccountDayMove
 }
 
 private struct CachedToken: Codable {
     var accessToken: String
     var expiresAt: Date
-}
-
-private enum JSONNumber {
-    static func double(_ raw: Any?) -> Double {
-        if let number = raw as? NSNumber { return number.doubleValue }
-        if let value = raw as? Double { return value }
-        if let value = raw as? Int { return Double(value) }
-        if let value = raw as? String {
-            let cleaned = value.replacingOccurrences(of: ",", with: "").replacingOccurrences(of: "$", with: "")
-            return Double(cleaned) ?? 0
-        }
-        return 0
-    }
 }
 
 enum PublicClientError: LocalizedError {

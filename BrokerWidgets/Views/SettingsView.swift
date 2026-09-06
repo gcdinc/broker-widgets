@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
+    @State private var confirmClearSecrets = false
 
     var body: some View {
         Form {
@@ -24,6 +24,10 @@ struct SettingsView: View {
                     }
                     .disabled(appState.publicSecretDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+                Toggle("Show widget", isOn: $appState.showPublicPanel)
+                    .onChange(of: appState.showPublicPanel) { _, show in
+                        setPanel("public-desktop", show)
+                    }
                 snapshotSummary(appState.publicSnapshot)
             }
 
@@ -32,8 +36,7 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 HStack {
-                    Button("Sign in to Fidelity…") {
-                        FidelityEngine.shared.openPositionsPage()
+                    Button(appState.fidelitySignedIn ? "Open Fidelity session…" : "Sign in to Fidelity…") {
                         openWindow(id: "fidelity-login")
                     }
                     if appState.fidelitySignedIn {
@@ -42,18 +45,32 @@ struct SettingsView: View {
                         }
                     }
                 }
+                Toggle("Show widget", isOn: $appState.showFidelityPanel)
+                    .onChange(of: appState.showFidelityPanel) { _, show in
+                        setPanel("fidelity-desktop", show)
+                    }
                 snapshotSummary(appState.fidelitySnapshot)
             }
 
             Section("Status") {
+                lastUpdatedLabel
                 if let error = appState.lastError {
                     Text(error)
                         .font(.caption)
                         .foregroundStyle(.red)
-                } else {
-                    Text("Last refresh completed.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                }
+                Button("Clear all secrets", role: .destructive) {
+                    confirmClearSecrets = true
+                }
+                .foregroundStyle(.red)
+                .confirmationDialog(
+                    "Remove the Public API secret and Fidelity cookies from Keychain?",
+                    isPresented: $confirmClearSecrets,
+                    titleVisibility: .visible
+                ) {
+                    Button("Clear all secrets", role: .destructive) {
+                        Task { await appState.clearAllSecrets() }
+                    }
                 }
             }
 
@@ -67,6 +84,28 @@ struct SettingsView: View {
                     appState.setPanelFontScale(scale)
                 }
                 Text("Drag a panel corner to resize. Panels sit with normal windows, not on top of other apps. Close with the × in the panel.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Updates") {
+                Text("This copy is \(AppUpdate.currentVersionLabel).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Text(appState.updateStatus.message)
+                    .font(.caption)
+                    .foregroundStyle(updateStatusColor)
+                Toggle("Automatically install updates", isOn: $appState.autoUpdateEnabled)
+                    .onChange(of: appState.autoUpdateEnabled) { _, enabled in
+                        appState.setAutoUpdate(enabled)
+                    }
+                Button {
+                    Task { await appState.checkForAppUpdate(installIfAvailable: true) }
+                } label: {
+                    Label(appState.isUpdating ? "Updating…" : "Update Now", systemImage: "arrow.down.app")
+                }
+                .disabled(appState.isUpdating)
+                Text("Checks gcdsoftware.com/downloads/latest and installs BrokerWidgets.zip when that build is newer.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -90,26 +129,19 @@ struct SettingsView: View {
                 .onChange(of: appState.refreshInterval) { _, seconds in
                     appState.setRefreshInterval(seconds)
                 }
+                Button("Reset to default") {
+                    appState.resetRefreshInterval()
+                }
+                .disabled(appState.refreshInterval == RefreshSettings.defaultSeconds)
                 Button {
                     Task { await appState.refreshAll() }
                 } label: {
                     Label(appState.isRefreshing ? "Refreshing…" : "Refresh now", systemImage: "arrow.clockwise")
                 }
                 .disabled(appState.isRefreshing)
-                Text("Default is hourly. Two floating desktop panels open automatically and update with the app. macOS WidgetKit widgets can still be added; keep this menu-bar app running.")
+                Text("Default is hourly. Use Show widget under each broker to open or hide that desktop panel.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Toggle("Show floating desktop panels", isOn: $appState.showDesktopPanels)
-                    .onChange(of: appState.showDesktopPanels) { _, show in
-                        appState.setShowDesktopPanels(show)
-                        if show {
-                            openWindow(id: "public-desktop")
-                            openWindow(id: "fidelity-desktop")
-                        } else {
-                            dismissWindow(id: "public-desktop")
-                            dismissWindow(id: "fidelity-desktop")
-                        }
-                    }
                 if !SnapshotStore.isAvailable {
                     Text("App Group is unavailable, so widgets cannot read holdings. In Xcode enable App Groups (`group.com.gcd.BrokerWidgets`) on both targets.")
                         .font(.caption)
@@ -124,12 +156,48 @@ struct SettingsView: View {
         }
     }
 
+    private func setPanel(_ windowID: String, _ show: Bool) {
+        appState.setPanelVisible(windowID, show)
+        if show {
+            openWindow(id: windowID)
+        } else {
+            DesktopPanelWindows.close(windowID)
+        }
+    }
+
+    private var lastUpdatedLabel: some View {
+        Text(lastUpdatedText)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    private var lastUpdatedText: String {
+        guard let date = appState.lastHoldingsUpdate else {
+            return "Last updated: never"
+        }
+        return "Last updated \(date.formatted(date: .abbreviated, time: .shortened))"
+    }
+
+    private var updateStatusColor: Color {
+        switch appState.updateStatus {
+        case .failed:
+            return .red
+        case .available, .installed:
+            return .green
+        default:
+            return .secondary
+        }
+    }
+
     @ViewBuilder
     private func snapshotSummary(_ snapshot: PortfolioSnapshot) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             if snapshot.status == .ok {
                 Text("\(MoneyFormat.usd(snapshot.totalValue))  \(MoneyFormat.signedUsd(snapshot.dayChangeValue))")
                     .font(.body.monospacedDigit())
+                Text("Updated \(snapshot.updatedAt.formatted(date: .omitted, time: .shortened))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 ForEach(snapshot.positions.prefix(8)) { position in
                     HStack {
                         Text(position.displaySymbol).font(.caption.monospaced()).frame(width: 88, alignment: .leading)

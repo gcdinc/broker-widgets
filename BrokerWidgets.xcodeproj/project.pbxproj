@@ -11,33 +11,48 @@
 		06C7D61C706E864F35E9C542 /* BrokerWidgetsWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB12725B20A478656BDFC50B /* BrokerWidgetsWidgets.swift */; };
 		0DF6CD24B9F1DBC6721D8FC1 /* PortfolioPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */; };
 		15601906F8CAAC44448C2B48 /* SnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F688566984520E27535C69BB /* SnapshotStore.swift */; };
+		18C52672891C4F8B688B1CA0 /* FidelityHoldingRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1601672194483C0546A36286 /* FidelityHoldingRules.swift */; };
 		191C2D013359EDC5C1BB1F60 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50368236082021D589B497C2 /* Constants.swift */; };
 		1AFC1071767054E9C179E192 /* MoneyFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47652C9034911847AAD50B5 /* MoneyFormat.swift */; };
 		1C4982E727169933A5A31050 /* RefreshSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */; };
+		1CF8AFFC27098C45C78559F3 /* AppUpdateStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CEF8E72666DB480D58B63C6 /* AppUpdateStatus.swift */; };
 		1E52FF566F9BF50FDF935CC9 /* BrokerWidgetsWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 60CBBBF7D0EB63A578A5E8CF /* BrokerWidgetsWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		20367BB30E62BE796AB82379 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A12A21D969B6015FD21A66 /* KeychainStore.swift */; };
+		2194728C263C5B7B49F51F99 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDBDCECB814C325007F76EF /* JSONValue.swift */; };
 		271EB34B8D39E73AE699B9BE /* FidelityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */; };
 		292D0B42AAA79103DC3E0E71 /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28BC851CF1D59F5191E9FB /* Position.swift */; };
 		352CDE68F67D0E9E390F6725 /* RefreshSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6008C22EC6CB9C807E84D74 /* RefreshSettings.swift */; };
 		3F9DDE5CB19E1D90B6A1D755 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50368236082021D589B497C2 /* Constants.swift */; };
 		4635724B996C5425A6105B54 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF2356DCFB22AC2BDE871B13 /* Assets.xcassets */; };
 		46AA95011AA1A67E9FE7F57B /* StatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A083BEAE0034AB05957BF5A /* StatusView.swift */; };
+		4996E2F7254D007DDEDE3B43 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDBDCECB814C325007F76EF /* JSONValue.swift */; };
 		583B79899E5A253466586A52 /* PublicClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7E552412C6A2F5111645 /* PublicClient.swift */; };
 		58C37A900DCDE115245041EF /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7DEA9AE752D833B4A61905C /* LaunchAtLogin.swift */; };
 		5BD15AB861C8891F5B7FB7BD /* Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E28BC851CF1D59F5191E9FB /* Position.swift */; };
 		665A95CC747BCB554EDB4CD9 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */; };
+		72BA137CD686681D7CF59BB1 /* FidelityHoldingRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB061290BE7FC51AD1B54C11 /* FidelityHoldingRulesTests.swift */; };
 		768265A8CDA01D2C341B3550 /* MoneyFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47652C9034911847AAD50B5 /* MoneyFormat.swift */; };
+		79EC1E4AED646A3838D50239 /* AppUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75B1856D772CBA7FFFD799FC /* AppUpdate.swift */; };
+		81BB34B1CDD7635A27F44259 /* AppUpdateDownload.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97520E650CE7626AEBA7804 /* AppUpdateDownload.swift */; };
 		8290490D01D17D8700D41D85 /* BrokerKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */; };
 		83650E6E49EE611E4CE60CF0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FC6729684CB1DC2EFCEF81 /* SettingsView.swift */; };
+		8C28BD712B1ACCAA54E107A4 /* FidelityScripts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 959B9DDDDFBE0D940A64AE95 /* FidelityScripts.swift */; };
 		8E0BCA1A943059FC3281E0FF /* DesktopPanelWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21A04BE14CF70047D30AA87A /* DesktopPanelWindow.swift */; };
 		98893DA55ED205CB34A0067A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7155E8F937F07B2DEF204155 /* Assets.xcassets */; };
+		A011BC553123A160BA0AD487 /* FidelityPositionWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AAADBD2FA7C96BEA6F3954 /* FidelityPositionWalk.swift */; };
+		A269F0B0977E8686D58874F7 /* FidelityCaptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6196F66638CD00840594489 /* FidelityCaptureModels.swift */; };
 		BA71ADE2313B886546A99A5B /* FidelityCaptureParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */; };
+		BE798A0D5E1EB8F76196AF9E /* AppUpdateInstall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */; };
 		C101FEB56A2F5F311BAFBE43 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */; };
 		C2F1FDC095CAB146365126B9 /* PortfolioPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */; };
+		CFE3334B681CC5BC8592FC1D /* FidelityCaptureParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8C1190C4F2585F8E277FF8 /* FidelityCaptureParserTests.swift */; };
+		D1630EBA0248C4B8ECE5AE51 /* SharedLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58C8B840A04D52E4AAD6B2B2 /* SharedLogicTests.swift */; };
+		D1E3810F037BAB625D93154B /* FidelityJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17CD03603A3FA0E1EF53F0A /* FidelityJSON.swift */; };
 		DB33D84601F481A1AE9F62F6 /* BrokerWidgetsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */; };
 		DC458454C935D65539D27C59 /* SnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F688566984520E27535C69BB /* SnapshotStore.swift */; };
 		E637AF27C83DCF96D38FFBE5 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */; };
 		E9C3BEAACAF563E43F133455 /* FidelityLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD339411F365E5E748F3A411 /* FidelityLoginView.swift */; };
+		EE515C622E441C4E893E481E /* AppUpdateVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43D175DCE5B3EF03816BED5C /* AppUpdateVersion.swift */; };
 		EF4A0632C278CE7D8AC11769 /* MarketQuotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */; };
 		F2AB301395044CD04507B924 /* BrokerKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */; };
 /* End PBXBuildFile section */
@@ -49,6 +64,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 160EA063FB5F7CAF61890290;
 			remoteInfo = BrokerWidgetsWidgets;
+		};
+		CD62906CB24C4E94A81A07D9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A9B7623FDE2AA1AE6CF3CBFC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3AD331A9437BC9E98C45776F;
+			remoteInfo = BrokerWidgets;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -69,18 +91,26 @@
 /* Begin PBXFileReference section */
 		079D05C61B6BDB3FF7DC7B6E /* BrokerWidgetsWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrokerWidgetsWidgets.entitlements; sourceTree = "<group>"; };
 		0D43B506684421726985D5AB /* BrokerWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BrokerWidgets.entitlements; sourceTree = "<group>"; };
+		1601672194483C0546A36286 /* FidelityHoldingRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityHoldingRules.swift; sourceTree = "<group>"; };
 		17A12A21D969B6015FD21A66 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityCaptureParser.swift; sourceTree = "<group>"; };
 		21A04BE14CF70047D30AA87A /* DesktopPanelWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesktopPanelWindow.swift; sourceTree = "<group>"; };
+		23AAADBD2FA7C96BEA6F3954 /* FidelityPositionWalk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityPositionWalk.swift; sourceTree = "<group>"; };
+		2CEF8E72666DB480D58B63C6 /* AppUpdateStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateStatus.swift; sourceTree = "<group>"; };
 		3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketQuotes.swift; sourceTree = "<group>"; };
+		43D175DCE5B3EF03816BED5C /* AppUpdateVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateVersion.swift; sourceTree = "<group>"; };
 		4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		4E28BC851CF1D59F5191E9FB /* Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Position.swift; sourceTree = "<group>"; };
 		50368236082021D589B497C2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		5872641101481889B2516810 /* BrokerWidgets.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrokerWidgets.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		58C8B840A04D52E4AAD6B2B2 /* SharedLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedLogicTests.swift; sourceTree = "<group>"; };
 		60CBBBF7D0EB63A578A5E8CF /* BrokerWidgetsWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrokerWidgetsWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7155E8F937F07B2DEF204155 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		75B1856D772CBA7FFFD799FC /* AppUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdate.swift; sourceTree = "<group>"; };
 		7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerWidgetsApp.swift; sourceTree = "<group>"; };
+		87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateInstall.swift; sourceTree = "<group>"; };
 		8A083BEAE0034AB05957BF5A /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
+		959B9DDDDFBE0D940A64AE95 /* FidelityScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityScripts.swift; sourceTree = "<group>"; };
 		984DD4AC2F5313DD60BE1BD2 /* PositionsWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionsWidgetView.swift; sourceTree = "<group>"; };
 		9F6613AFF7D0BEF6260666F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A7DEA9AE752D833B4A61905C /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
@@ -92,7 +122,14 @@
 		BDC122AA61FA7597C8D619F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettings.swift; sourceTree = "<group>"; };
 		C1BF7E552412C6A2F5111645 /* PublicClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublicClient.swift; sourceTree = "<group>"; };
+		C6196F66638CD00840594489 /* FidelityCaptureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityCaptureModels.swift; sourceTree = "<group>"; };
 		CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityEngine.swift; sourceTree = "<group>"; };
+		CF8C1190C4F2585F8E277FF8 /* FidelityCaptureParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityCaptureParserTests.swift; sourceTree = "<group>"; };
+		CFC89E5B5AB821D20CADE356 /* BrokerWidgetsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrokerWidgetsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D17CD03603A3FA0E1EF53F0A /* FidelityJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityJSON.swift; sourceTree = "<group>"; };
+		DEDBDCECB814C325007F76EF /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
+		E97520E650CE7626AEBA7804 /* AppUpdateDownload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateDownload.swift; sourceTree = "<group>"; };
+		EB061290BE7FC51AD1B54C11 /* FidelityHoldingRulesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityHoldingRulesTests.swift; sourceTree = "<group>"; };
 		EB12725B20A478656BDFC50B /* BrokerWidgetsWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerWidgetsWidgets.swift; sourceTree = "<group>"; };
 		F1FC6729684CB1DC2EFCEF81 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F688566984520E27535C69BB /* SnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotStore.swift; sourceTree = "<group>"; };
@@ -110,10 +147,21 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		11F75A5B6631C578E4F9C338 /* BrokerWidgetsTests */ = {
+			isa = PBXGroup;
+			children = (
+				CF8C1190C4F2585F8E277FF8 /* FidelityCaptureParserTests.swift */,
+				EB061290BE7FC51AD1B54C11 /* FidelityHoldingRulesTests.swift */,
+				58C8B840A04D52E4AAD6B2B2 /* SharedLogicTests.swift */,
+			);
+			path = BrokerWidgetsTests;
+			sourceTree = "<group>";
+		};
 		1BAF15333642982510227452 = {
 			isa = PBXGroup;
 			children = (
 				2C4985B497DD9EF4C0C0A7A4 /* BrokerWidgets */,
+				11F75A5B6631C578E4F9C338 /* BrokerWidgetsTests */,
 				C3C28853099DBD3E2925DE71 /* BrokerWidgetsWidgets */,
 				83991D357F9C3D8E6D8A124F /* Shared */,
 				41CC052FCA0EAB5D97F34C42 /* Products */,
@@ -132,6 +180,11 @@
 			isa = PBXGroup;
 			children = (
 				4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */,
+				75B1856D772CBA7FFFD799FC /* AppUpdate.swift */,
+				E97520E650CE7626AEBA7804 /* AppUpdateDownload.swift */,
+				87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */,
+				2CEF8E72666DB480D58B63C6 /* AppUpdateStatus.swift */,
+				43D175DCE5B3EF03816BED5C /* AppUpdateVersion.swift */,
 				7155E8F937F07B2DEF204155 /* Assets.xcassets */,
 				0D43B506684421726985D5AB /* BrokerWidgets.entitlements */,
 				7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */,
@@ -149,6 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				5872641101481889B2516810 /* BrokerWidgets.app */,
+				CFC89E5B5AB821D20CADE356 /* BrokerWidgetsTests.xctest */,
 				60CBBBF7D0EB63A578A5E8CF /* BrokerWidgetsWidgets.appex */,
 			);
 			name = Products;
@@ -160,6 +214,7 @@
 				B1EB4874E895BDC2DB97B77E /* BrokerKind.swift */,
 				50368236082021D589B497C2 /* Constants.swift */,
 				BEA400AFCAC8F953AF64B984 /* DisplaySettings.swift */,
+				DEDBDCECB814C325007F76EF /* JSONValue.swift */,
 				B47652C9034911847AAD50B5 /* MoneyFormat.swift */,
 				ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */,
 				4E28BC851CF1D59F5191E9FB /* Position.swift */,
@@ -184,9 +239,14 @@
 		D4AFBB1DE166FD9C44593683 /* Fidelity */ = {
 			isa = PBXGroup;
 			children = (
+				C6196F66638CD00840594489 /* FidelityCaptureModels.swift */,
 				182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */,
 				CC5DB65B0F53AB07A4AFE9D2 /* FidelityEngine.swift */,
+				1601672194483C0546A36286 /* FidelityHoldingRules.swift */,
+				D17CD03603A3FA0E1EF53F0A /* FidelityJSON.swift */,
 				FD339411F365E5E748F3A411 /* FidelityLoginView.swift */,
+				23AAADBD2FA7C96BEA6F3954 /* FidelityPositionWalk.swift */,
+				959B9DDDDFBE0D940A64AE95 /* FidelityScripts.swift */,
 				3CFA2C9A97A1F9E7DC06FA41 /* MarketQuotes.swift */,
 			);
 			path = Fidelity;
@@ -233,6 +293,24 @@
 			productReference = 5872641101481889B2516810 /* BrokerWidgets.app */;
 			productType = "com.apple.product-type.application";
 		};
+		80DCDBEECEA72414F8D1F9AD /* BrokerWidgetsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 09C98E6DF05278530FB53D22 /* Build configuration list for PBXNativeTarget "BrokerWidgetsTests" */;
+			buildPhases = (
+				0AA2297A4AAA34CCE49A86AE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AD9A659D8F14BB6AD041EF0A /* PBXTargetDependency */,
+			);
+			name = BrokerWidgetsTests;
+			packageProductDependencies = (
+			);
+			productName = BrokerWidgetsTests;
+			productReference = CFC89E5B5AB821D20CADE356 /* BrokerWidgetsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -246,6 +324,9 @@
 						ProvisioningStyle = Automatic;
 					};
 					3AD331A9437BC9E98C45776F = {
+						ProvisioningStyle = Automatic;
+					};
+					80DCDBEECEA72414F8D1F9AD = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -265,6 +346,7 @@
 			projectRoot = "";
 			targets = (
 				3AD331A9437BC9E98C45776F /* BrokerWidgets */,
+				80DCDBEECEA72414F8D1F9AD /* BrokerWidgetsTests */,
 				160EA063FB5F7CAF61890290 /* BrokerWidgetsWidgets */,
 			);
 		};
@@ -290,19 +372,40 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0AA2297A4AAA34CCE49A86AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFE3334B681CC5BC8592FC1D /* FidelityCaptureParserTests.swift in Sources */,
+				72BA137CD686681D7CF59BB1 /* FidelityHoldingRulesTests.swift in Sources */,
+				D1630EBA0248C4B8ECE5AE51 /* SharedLogicTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4EF7465A075ABE33EE003CFD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				C101FEB56A2F5F311BAFBE43 /* AppState.swift in Sources */,
+				79EC1E4AED646A3838D50239 /* AppUpdate.swift in Sources */,
+				81BB34B1CDD7635A27F44259 /* AppUpdateDownload.swift in Sources */,
+				BE798A0D5E1EB8F76196AF9E /* AppUpdateInstall.swift in Sources */,
+				1CF8AFFC27098C45C78559F3 /* AppUpdateStatus.swift in Sources */,
+				EE515C622E441C4E893E481E /* AppUpdateVersion.swift in Sources */,
 				8290490D01D17D8700D41D85 /* BrokerKind.swift in Sources */,
 				DB33D84601F481A1AE9F62F6 /* BrokerWidgetsApp.swift in Sources */,
 				191C2D013359EDC5C1BB1F60 /* Constants.swift in Sources */,
 				8E0BCA1A943059FC3281E0FF /* DesktopPanelWindow.swift in Sources */,
 				E637AF27C83DCF96D38FFBE5 /* DisplaySettings.swift in Sources */,
+				A269F0B0977E8686D58874F7 /* FidelityCaptureModels.swift in Sources */,
 				BA71ADE2313B886546A99A5B /* FidelityCaptureParser.swift in Sources */,
 				271EB34B8D39E73AE699B9BE /* FidelityEngine.swift in Sources */,
+				18C52672891C4F8B688B1CA0 /* FidelityHoldingRules.swift in Sources */,
+				D1E3810F037BAB625D93154B /* FidelityJSON.swift in Sources */,
 				E9C3BEAACAF563E43F133455 /* FidelityLoginView.swift in Sources */,
+				A011BC553123A160BA0AD487 /* FidelityPositionWalk.swift in Sources */,
+				8C28BD712B1ACCAA54E107A4 /* FidelityScripts.swift in Sources */,
+				2194728C263C5B7B49F51F99 /* JSONValue.swift in Sources */,
 				20367BB30E62BE796AB82379 /* KeychainStore.swift in Sources */,
 				58C37A900DCDE115245041EF /* LaunchAtLogin.swift in Sources */,
 				EF4A0632C278CE7D8AC11769 /* MarketQuotes.swift in Sources */,
@@ -325,6 +428,7 @@
 				06C7D61C706E864F35E9C542 /* BrokerWidgetsWidgets.swift in Sources */,
 				3F9DDE5CB19E1D90B6A1D755 /* Constants.swift in Sources */,
 				665A95CC747BCB554EDB4CD9 /* DisplaySettings.swift in Sources */,
+				4996E2F7254D007DDEDE3B43 /* JSONValue.swift in Sources */,
 				1AFC1071767054E9C179E192 /* MoneyFormat.swift in Sources */,
 				C2F1FDC095CAB146365126B9 /* PortfolioPanelView.swift in Sources */,
 				292D0B42AAA79103DC3E0E71 /* Position.swift in Sources */,
@@ -342,6 +446,11 @@
 			target = 160EA063FB5F7CAF61890290 /* BrokerWidgetsWidgets */;
 			targetProxy = 21ADD4FCB3489F269B16D60D /* PBXContainerItemProxy */;
 		};
+		AD9A659D8F14BB6AD041EF0A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3AD331A9437BC9E98C45776F /* BrokerWidgets */;
+			targetProxy = CD62906CB24C4E94A81A07D9 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -350,17 +459,12 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = BrokerWidgetsWidgets/BrokerWidgetsWidgets.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H4T9WF8HW5;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BrokerWidgetsWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Broker Widgets";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets.widgets;
 				PRODUCT_NAME = BrokerWidgetsWidgets;
 				SDKROOT = macosx;
@@ -376,17 +480,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BrokerWidgets/BrokerWidgets.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = H4T9WF8HW5;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BrokerWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Broker Widgets";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets;
 				PRODUCT_NAME = BrokerWidgets;
 				SDKROOT = macosx;
@@ -429,7 +530,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -449,7 +550,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -469,39 +570,66 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = BrokerWidgets/BrokerWidgets.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = H4T9WF8HW5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BrokerWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Broker Widgets";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets;
 				PRODUCT_NAME = BrokerWidgets;
 				SDKROOT = macosx;
 			};
 			name = Release;
 		};
+		7C0AA226A7711A89F7B2182C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BrokerWidgets.app/Contents/MacOS/BrokerWidgets";
+			};
+			name = Release;
+		};
+		7EC283C0ADBD26D6C7663468 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BrokerWidgets.app/Contents/MacOS/BrokerWidgets";
+			};
+			name = Debug;
+		};
 		D50980BFCCD9C4F2137C764B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = BrokerWidgetsWidgets/BrokerWidgetsWidgets.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = H4T9WF8HW5;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BrokerWidgetsWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Broker Widgets";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-					"@executable_path/../../../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gcd.BrokerWidgets.widgets;
 				PRODUCT_NAME = BrokerWidgetsWidgets;
 				SDKROOT = macosx;
@@ -546,7 +674,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -560,7 +688,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -575,6 +703,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		09C98E6DF05278530FB53D22 /* Build configuration list for PBXNativeTarget "BrokerWidgetsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7EC283C0ADBD26D6C7663468 /* Debug */,
+				7C0AA226A7711A89F7B2182C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		2EC55BE599DB622B85BD79AC /* Build configuration list for PBXNativeTarget "BrokerWidgets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

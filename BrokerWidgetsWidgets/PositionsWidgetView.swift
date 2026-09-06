@@ -13,7 +13,7 @@ struct PositionsWidgetView: View {
         PortfolioPanelView(
             snapshot: entry.snapshot,
             fontScale: DisplaySettings.fontScale,
-            maxRows: family == .systemLarge ? 8 : 4
+            maxRows: rowLimit
         )
             .containerBackground(for: .widget) {
                 Color.clear
