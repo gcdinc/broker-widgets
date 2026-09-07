@@ -36,14 +36,14 @@ enum AppUpdateDownload {
         )
     }
 
-    static func run(_ launchPath: String, arguments: [String]) throws {
+    private static func run(_ launchPath: String, arguments: [String]) throws {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: launchPath)
         process.arguments = arguments
         try process.run()
         process.waitUntilExit()
         guard process.terminationStatus == 0 else {
-            throw AppUpdateError.installFailed
+            throw AppUpdateError.invalidArchive
         }
     }
 

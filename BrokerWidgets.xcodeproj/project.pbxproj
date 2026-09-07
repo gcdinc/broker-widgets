@@ -42,7 +42,6 @@
 		A011BC553123A160BA0AD487 /* FidelityPositionWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23AAADBD2FA7C96BEA6F3954 /* FidelityPositionWalk.swift */; };
 		A269F0B0977E8686D58874F7 /* FidelityCaptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6196F66638CD00840594489 /* FidelityCaptureModels.swift */; };
 		BA71ADE2313B886546A99A5B /* FidelityCaptureParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182CB264099F5722CA6681A8 /* FidelityCaptureParser.swift */; };
-		BE798A0D5E1EB8F76196AF9E /* AppUpdateInstall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */; };
 		C101FEB56A2F5F311BAFBE43 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */; };
 		C2F1FDC095CAB146365126B9 /* PortfolioPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1EDFAF6A5D153061D52BB /* PortfolioPanelView.swift */; };
 		CFE3334B681CC5BC8592FC1D /* FidelityCaptureParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8C1190C4F2585F8E277FF8 /* FidelityCaptureParserTests.swift */; };
@@ -108,7 +107,6 @@
 		7155E8F937F07B2DEF204155 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		75B1856D772CBA7FFFD799FC /* AppUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdate.swift; sourceTree = "<group>"; };
 		7DCE778FFEFD2183A1CF075B /* BrokerWidgetsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrokerWidgetsApp.swift; sourceTree = "<group>"; };
-		87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateInstall.swift; sourceTree = "<group>"; };
 		8A083BEAE0034AB05957BF5A /* StatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusView.swift; sourceTree = "<group>"; };
 		959B9DDDDFBE0D940A64AE95 /* FidelityScripts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FidelityScripts.swift; sourceTree = "<group>"; };
 		984DD4AC2F5313DD60BE1BD2 /* PositionsWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionsWidgetView.swift; sourceTree = "<group>"; };
@@ -182,7 +180,6 @@
 				4CF803DE15CE0BE9DBEF0FD1 /* AppState.swift */,
 				75B1856D772CBA7FFFD799FC /* AppUpdate.swift */,
 				E97520E650CE7626AEBA7804 /* AppUpdateDownload.swift */,
-				87C6FF82C04931F03E4CA1F4 /* AppUpdateInstall.swift */,
 				2CEF8E72666DB480D58B63C6 /* AppUpdateStatus.swift */,
 				43D175DCE5B3EF03816BED5C /* AppUpdateVersion.swift */,
 				7155E8F937F07B2DEF204155 /* Assets.xcassets */,
@@ -389,7 +386,6 @@
 				C101FEB56A2F5F311BAFBE43 /* AppState.swift in Sources */,
 				79EC1E4AED646A3838D50239 /* AppUpdate.swift in Sources */,
 				81BB34B1CDD7635A27F44259 /* AppUpdateDownload.swift in Sources */,
-				BE798A0D5E1EB8F76196AF9E /* AppUpdateInstall.swift in Sources */,
 				1CF8AFFC27098C45C78559F3 /* AppUpdateStatus.swift in Sources */,
 				EE515C622E441C4E893E481E /* AppUpdateVersion.swift in Sources */,
 				8290490D01D17D8700D41D85 /* BrokerKind.swift in Sources */,

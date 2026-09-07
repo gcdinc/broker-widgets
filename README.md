@@ -50,15 +50,9 @@ This can break when Fidelity changes their site.
 
 ## Updates
 
-Settings → **Automatically install updates** (on by default) and **Update Now**.
+Settings → **Check for updates**. If a newer build is on gcdsoftware.com, use **Go to download page** and replace `BrokerWidgets.app` in Applications.
 
-The app compares its version to `https://gcdsoftware.com/downloads/latest/BrokerWidgets.zip`. Optional `BrokerWidgets.json` next to the zip skips downloading the archive just to read the version:
-
-```json
-{ "version": "1.0.2", "build": "3" }
-```
-
-Copy the app to `/Applications` so it can replace itself. Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml` before you upload a new zip, or existing copies will think they are already current.
+The app compares its version to `https://gcdsoftware.com/downloads/latest/BrokerWidgets.json`. Bump `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` in `project.yml` before you upload a new zip, or existing copies will think they are already current.
 
 ## Refresh
 

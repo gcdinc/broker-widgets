@@ -10,22 +10,13 @@ enum AppUpdate {
         "\(AppSoftwareVersion.local.marketing) (\(AppSoftwareVersion.local.build))"
     }
 
-    static func check(
-        installIfAvailable: Bool,
-        progress: ((AppUpdateStatus) -> Void)? = nil
-    ) async throws -> AppUpdateStatus {
-        progress?(.checking)
+    static func check() async throws -> AppUpdateStatus {
         let remote = try await fetchRemoteVersion()
         UserDefaults.standard.set(Date(), forKey: "update.lastCheckedAt")
         guard AppSoftwareVersion.isNewer(remote, than: .local) else {
             return .upToDate
         }
-        let label = "\(remote.marketing) (\(remote.build))"
-        guard installIfAvailable else {
-            return .available(latest: label)
-        }
-        progress?(.downloading)
-        return try await AppUpdateInstall.install(remote: remote, latestLabel: label, progress: progress)
+        return .available(latest: "\(remote.marketing) (\(remote.build))")
     }
 
     private struct Manifest: Decodable {

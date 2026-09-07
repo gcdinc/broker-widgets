@@ -16,7 +16,6 @@ final class AppState: ObservableObject {
     @Published var showPublicPanel: Bool
     @Published var panelFontScale: Double
     @Published var launchAtLogin: Bool
-    @Published var autoUpdateEnabled: Bool
     @Published var updateStatus: AppUpdateStatus = .idle
     @Published var isUpdating = false
 
@@ -36,7 +35,6 @@ final class AppState: ObservableObject {
         panelFontScale = DisplaySettings.fontScale
         LaunchAtLogin.enableOnFirstLaunchIfNeeded()
         launchAtLogin = LaunchAtLogin.isEnabled
-        autoUpdateEnabled = AppUpdateSettings.isEnabled
         hasPublicSecret = KeychainStore.get(.publicSecret) != nil
         fidelitySignedIn = FidelityEngine.shared.isLikelySignedIn
         if cleaned.totalValue != loadedFidelity.totalValue || cleaned.positions.count != loadedFidelity.positions.count {
@@ -45,7 +43,10 @@ final class AppState: ObservableObject {
     }
 
     var menuBarShowsWarning: Bool {
-        fidelitySnapshot.status == .needsSignIn || publicSnapshot.status == .needsSecret || lastError != nil
+        fidelitySnapshot.status == .needsSignIn
+            || publicSnapshot.status == .needsSecret
+            || lastError != nil
+            || updateStatus.isAvailable
     }
 
     func start() {
@@ -54,7 +55,7 @@ final class AppState: ObservableObject {
         rescheduleTimer()
         scheduleUpdateChecks()
         Task { await refreshAll() }
-        Task { await checkForAppUpdate(installIfAvailable: autoUpdateEnabled) }
+        Task { await checkForAppUpdate() }
     }
 
     var lastHoldingsUpdate: Date? {
@@ -106,24 +107,12 @@ final class AppState: ObservableObject {
         launchAtLogin = LaunchAtLogin.isEnabled
     }
 
-    func setAutoUpdate(_ enabled: Bool) {
-        autoUpdateEnabled = enabled
-        AppUpdateSettings.isEnabled = enabled
-        if enabled {
-            Task { await checkForAppUpdate(installIfAvailable: true) }
-        }
-    }
-
-    func checkForAppUpdate(installIfAvailable: Bool) async {
+    func checkForAppUpdate() async {
         guard !isUpdating else { return }
         isUpdating = true
         updateStatus = .checking
         do {
-            updateStatus = try await AppUpdate.check(installIfAvailable: installIfAvailable) { [weak self] status in
-                Task { @MainActor in
-                    self?.updateStatus = status
-                }
-            }
+            updateStatus = try await AppUpdate.check()
         } catch {
             updateStatus = .failed(error.localizedDescription)
         }
@@ -257,7 +246,7 @@ final class AppState: ObservableObject {
         let scheduled = Timer(timeInterval: 12 * 60 * 60, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self else { return }
-                await self.checkForAppUpdate(installIfAvailable: self.autoUpdateEnabled)
+                await self.checkForAppUpdate()
             }
         }
         RunLoop.main.add(scheduled, forMode: .common)

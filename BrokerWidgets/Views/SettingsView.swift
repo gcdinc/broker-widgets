@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct SettingsView: View {
@@ -95,17 +96,20 @@ struct SettingsView: View {
                 Text(appState.updateStatus.message)
                     .font(.caption)
                     .foregroundStyle(updateStatusColor)
-                Toggle("Automatically install updates", isOn: $appState.autoUpdateEnabled)
-                    .onChange(of: appState.autoUpdateEnabled) { _, enabled in
-                        appState.setAutoUpdate(enabled)
-                    }
                 Button {
-                    Task { await appState.checkForAppUpdate(installIfAvailable: true) }
+                    Task { await appState.checkForAppUpdate() }
                 } label: {
-                    Label(appState.isUpdating ? "Updating…" : "Update Now", systemImage: "arrow.down.app")
+                    Label(appState.isUpdating ? "Checking…" : "Check for updates", systemImage: "arrow.clockwise")
                 }
                 .disabled(appState.isUpdating)
-                Text("Checks gcdsoftware.com/downloads/latest and installs BrokerWidgets.zip when that build is newer.")
+                if appState.updateStatus.isAvailable {
+                    Button {
+                        NSWorkspace.shared.open(AppConstants.productPageURL)
+                    } label: {
+                        Label("Go to download page", systemImage: "safari")
+                    }
+                }
+                Text("The app cannot replace itself. Download BrokerWidgets.zip from gcdsoftware.com and drop the new app on Applications.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -182,7 +186,7 @@ struct SettingsView: View {
         switch appState.updateStatus {
         case .failed:
             return .red
-        case .available, .installed:
+        case .available:
             return .green
         default:
             return .secondary
