@@ -15,6 +15,7 @@ final class AppState: ObservableObject {
     @Published var showFidelityPanel: Bool
     @Published var showPublicPanel: Bool
     @Published var panelFontScale: Double
+    @Published var panelsAlwaysOnTop: Bool
     @Published var launchAtLogin: Bool
     @Published var updateStatus: AppUpdateStatus = .idle
     @Published var isUpdating = false
@@ -33,6 +34,7 @@ final class AppState: ObservableObject {
         showFidelityPanel = UserDefaults.standard.object(forKey: "showFidelityPanel") as? Bool ?? both
         showPublicPanel = UserDefaults.standard.object(forKey: "showPublicPanel") as? Bool ?? both
         panelFontScale = DisplaySettings.fontScale
+        panelsAlwaysOnTop = DisplaySettings.alwaysOnTop
         LaunchAtLogin.enableOnFirstLaunchIfNeeded()
         launchAtLogin = LaunchAtLogin.isEnabled
         hasPublicSecret = KeychainStore.get(.publicSecret) != nil
@@ -100,6 +102,11 @@ final class AppState: ObservableObject {
         panelFontScale = scale
         DisplaySettings.fontScale = scale
         reloadWidgets()
+    }
+
+    func setPanelsAlwaysOnTop(_ enabled: Bool) {
+        panelsAlwaysOnTop = enabled
+        DisplaySettings.alwaysOnTop = enabled
     }
 
     func setLaunchAtLogin(_ enabled: Bool) {

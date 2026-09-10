@@ -22,7 +22,7 @@ struct DesktopPanelWindow: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .background(DesktopWindowConfigurator(windowID: windowID))
+        .background(DesktopWindowConfigurator(windowID: windowID, alwaysOnTop: appState.panelsAlwaysOnTop))
     }
 }
 
@@ -48,6 +48,7 @@ enum DesktopPanelWindows {
 
 struct DesktopWindowConfigurator: NSViewRepresentable {
     let windowID: String
+    var alwaysOnTop: Bool
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
@@ -62,7 +63,7 @@ struct DesktopWindowConfigurator: NSViewRepresentable {
     private func configure(_ window: NSWindow?) {
         guard let window else { return }
         window.identifier = NSUserInterfaceItemIdentifier(windowID)
-        window.level = .normal
+        window.level = alwaysOnTop ? .floating : .normal
         window.hasShadow = true
         window.isOpaque = false
         window.backgroundColor = .clear
@@ -73,7 +74,9 @@ struct DesktopWindowConfigurator: NSViewRepresentable {
         window.styleMask.insert(.closable)
         window.styleMask.insert(.fullSizeContentView)
         window.styleMask.remove(.miniaturizable)
-        window.collectionBehavior = [.fullScreenAuxiliary]
+        window.collectionBehavior = alwaysOnTop
+            ? [.canJoinAllSpaces, .fullScreenAuxiliary]
+            : [.fullScreenAuxiliary]
         window.standardWindowButton(.closeButton)?.isHidden = true
         window.standardWindowButton(.miniaturizeButton)?.isHidden = true
         window.standardWindowButton(.zoomButton)?.isHidden = true

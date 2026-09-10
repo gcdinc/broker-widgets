@@ -84,7 +84,11 @@ struct SettingsView: View {
                 .onChange(of: appState.panelFontScale) { _, scale in
                     appState.setPanelFontScale(scale)
                 }
-                Text("Drag a panel corner to resize. Panels sit with normal windows, not on top of other apps. Close with the × in the panel.")
+                Toggle("Always on top", isOn: $appState.panelsAlwaysOnTop)
+                    .onChange(of: appState.panelsAlwaysOnTop) { _, enabled in
+                        appState.setPanelsAlwaysOnTop(enabled)
+                    }
+                Text("Drag a panel corner to resize. Close with the × in the panel. Always on top keeps the panels above other windows.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

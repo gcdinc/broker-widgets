@@ -2,6 +2,7 @@ import Foundation
 
 enum DisplaySettings {
     static let fontScaleKey = "panelFontScale"
+    static let alwaysOnTopKey = "panelsAlwaysOnTop"
 
     static let fontChoices: [(label: String, scale: Double)] = [
         ("Small", 0.85),
@@ -18,6 +19,11 @@ enum DisplaySettings {
         set {
             suite.set(newValue, forKey: fontScaleKey)
         }
+    }
+
+    static var alwaysOnTop: Bool {
+        get { suite.bool(forKey: alwaysOnTopKey) }
+        set { suite.set(newValue, forKey: alwaysOnTopKey) }
     }
 
     static var suite: UserDefaults {
